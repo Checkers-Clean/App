@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:checker/appData.dart';
 
 class CreateUserPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
@@ -42,7 +43,14 @@ class CreateUserPage extends StatelessWidget {
             SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () {
-                // Lógica para crear usuario
+                AppData.CreateUser(_usernameController.text,
+                    _passwordController.text, _emailController.text);
+
+                _emailController.clear();
+                _passwordController.clear();
+                _repeatPasswordController.clear();
+                _usernameController.clear();
+                // Lógica para crear _usuario
               },
               child: Text('Crear usuario'),
             ),

@@ -1,7 +1,9 @@
+import 'package:checker/appData.dart';
 import 'package:checker/login_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  AppData.colocarfichas(AppData.piezasRojas, "r12", "h3");
   runApp(MyApp());
 }
 
