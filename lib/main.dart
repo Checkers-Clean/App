@@ -1,47 +1,45 @@
-import 'package:checker/appData.dart';
-import 'package:checker/login_page.dart';
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:window_manager/window_manager.dart';
+import 'app.dart';
+import 'appData.dart';
 
-void main() {
-  AppData.colocarfichas(AppData.piezasRojas, "r12", "h3");
-  runApp(MyApp());
+void main() async {
+  print("--------m0---------");
+  AppData.printerboard();
+  print("--------m0---------");
+  AppData.colocarfichas(AppData.piezasRojas, "r12", "h4");
+  print("--------m1---------");
+  AppData.printerboard();
+  print("--------m1---------");
+  AppData.colocarfichas(AppData.piezasRojas, "n12", "a5");
+  print("--------m2---------");
+  AppData.printerboard();
+  print("--------m2---------");
+  // For Linux, macOS and Windows, initialize WindowManager
+  try {
+    if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+      WidgetsFlutterBinding.ensureInitialized();
+      await WindowManager.instance.ensureInitialized();
+      windowManager.waitUntilReadyToShow().then(showWindow);
+    }
+  } catch (e) {
+    print(
+        e); // Se manejan errores aquí si hay algún problema al inicializar WindowManager
+  }
+
+  // Define the app as a ChangeNotifierProvider
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AppData(),
+      child: const App(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primaryColor: Colors.black, // Color de fondo de la barra de navegación
-        scaffoldBackgroundColor: Colors.black, // Color de fondo de la pantalla
-        textTheme: const TextTheme(
-          bodyText1: TextStyle(color: Colors.white), // Color del texto
-          bodyText2: TextStyle(color: Colors.white), // Color del texto
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black, // Color del botón
-            textStyle:
-                TextStyle(color: Colors.white), // Color del texto del botón
-          ),
-        ),
-        inputDecorationTheme: const InputDecorationTheme(
-          labelStyle: TextStyle(
-              color:
-                  Colors.white), // Color del texto de las etiquetas de entrada
-          hintStyle: TextStyle(
-              color: Colors.grey), // Color del texto de sugerencia de entrada
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-                color: Colors.grey), // Color del borde cuando está habilitado
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-                color: Colors.red), // Color del borde cuando está enfocado
-          ),
-        ),
-      ),
-      home: LoginPage(),
-    );
-  }
+// Show the window when it's ready
+void showWindow(_) async {
+  windowManager.setMinimumSize(const Size(300.0, 600.0));
+  await windowManager.setTitle('Checker');
 }

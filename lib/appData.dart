@@ -1,6 +1,13 @@
+import 'dart:convert';
+import 'dart:ffi';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-class AppData {
+class AppData extends ChangeNotifier {
   static List<List<String>> numeracion = [
     ['a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1'],
     ['a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2'],
@@ -10,6 +17,16 @@ class AppData {
     ['a6', 'b6', 'c6', 'd6', 'e6', 'f6', 'g6', 'h6'],
     ['a7', 'b7', 'c7', 'd7', 'e7', 'f7', 'g7', 'h7'],
     ['a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8']
+  ];
+  static List<List<String>> board_inicio = [
+    ['r1', '-', 'r2', '-', 'r3', '-', 'r4', '-'],
+    ['-', 'r5', '-', 'r6', '-', 'r7', '-', 'r8'],
+    ['r9', '-', 'r10', '-', 'r11', '-', 'r12', '-'],
+    ['-', '-', '-', '-', '-', '-', '-', '-'],
+    ['-', '-', '-', '-', '-', '-', '-', '-'],
+    ['-', 'n12', '-', 'n11', '-', 'n10', '-', 'n9'],
+    ['n8', '-', 'n7', '-', 'n6', '-', 'n5', '-'],
+    ['-', 'n4', '-', 'n3', '-', 'n2', '-', 'n1']
   ];
   static List<List<String>> board = [
     ['r1', '-', 'r2', '-', 'r3', '-', 'r4', '-'],
@@ -52,13 +69,30 @@ class AppData {
     ['n12', 'g8']
   ];
 
+  static void printerboard() {
+    for (var fila = 0; fila < board.length; fila++) {
+      print(board[fila]);
+    }
+  }
+
   static void colocarfichas(List<List<String>> piezas, String piezaSelecionada,
-      String NuevaPosicion) {
-    for (var pieza in piezas) {
-      if (pieza[0] == piezaSelecionada) {
-        bool esPosible = esMovimientoValido(pieza[1], NuevaPosicion);
-        print('Pieza: ${pieza[0]}, Coordenada: ${pieza[1]}');
-        print(esPosible);
+      String nuevaPosicion) {
+    for (var fila = 0; fila < board.length; fila++) {
+      for (var columna = 0; columna < board[fila].length; columna++) {
+        if (board[fila][columna] == piezaSelecionada) {
+          // Cambiar la posición de la pieza en el tablero
+          board[fila][columna] = '-';
+          // Encontrar las coordenadas de la nueva posición
+          int nuevaFila = int.parse(nuevaPosicion[1]) - 1;
+          int nuevaColumna = nuevaPosicion.codeUnitAt(0) - 'a'.codeUnitAt(0);
+          // Colocar la pieza en la nueva posición
+          board[nuevaFila][nuevaColumna] = piezaSelecionada;
+          // Imprimir el tablero actualizado
+          for (var filaTablero in board) {
+            print(filaTablero);
+          }
+          return;
+        }
       }
     }
   }
@@ -86,29 +120,32 @@ class AppData {
     return false;
   }
 
-  static String? username;
-  static String? password;
+  String? username;
+  String? password;
 
-  static String? new_username;
-  static String? new_password;
-  static String? new_email;
+  String? new_username;
+  String? new_password;
+  String? new_email;
 
-  static void saveUserData(String username, String password) {
-    AppData.username = username;
-    AppData.password = password;
+  bool validate = false;
+
+  void saveUser(String username, String password) {
+    this.username = username;
+    this.password = password;
+    loginUser("localhost:3000", username, password);
   }
 
-  static void CreateUser(
-      String new_username, String new_password, String new_email) {
-    AppData.new_username = new_username;
-    AppData.new_password = new_password;
-    AppData.new_email = new_email;
+  void CreateUser(String new_username, String new_password, String new_email) {
+    this.new_username = new_username;
+    this.new_password = new_password;
+    this.new_email = new_email;
   }
 
-  static Future<void> loginUser() async {
+  Future<void> loginUser(
+      String serverUrl, String username, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('http://tu_servidor_nodejs.com/login'),
+        Uri.parse('http://$serverUrl/login'),
         body: {
           'username': username,
           'password': password,
@@ -118,6 +155,8 @@ class AppData {
       if (response.statusCode == 200) {
         // Procesar la respuesta si es exitosa
         print('Usuario autenticado');
+        validate = true;
+        notifyListeners();
       } else {
         // Manejar errores si la solicitud no es exitosa
         print('Error al autenticar usuario');

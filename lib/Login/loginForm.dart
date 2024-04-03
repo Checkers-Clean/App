@@ -1,6 +1,9 @@
-import 'package:checker/appData.dart';
+import 'package:checker/GameSreen.dart';
 import 'package:flutter/material.dart';
-import 'create_user_page.dart';
+import 'package:provider/provider.dart';
+import '../appData.dart';
+import '../CreateUser/createPage.dart';
+import '../CreateUser/createUserForm.dart';
 
 class LoginForm extends StatefulWidget {
   @override
@@ -13,6 +16,7 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
+    var appData = Provider.of<AppData>(context);
     return Padding(
       padding: EdgeInsets.all(20.0),
       child: Column(
@@ -32,15 +36,21 @@ class _LoginFormState extends State<LoginForm> {
           ElevatedButton(
             onPressed: () {
               // Guardar las variables utilizando la función de AppData
-              AppData.saveUserData(
-                  _usernameController.text, _passwordController.text);
-
-              // Lógica para iniciar sesión
+              Provider.of<AppData>(context, listen: false).saveUser(
+                _usernameController.text,
+                _passwordController.text,
+              );
 
               // Vaciar los campos de texto
               _usernameController.clear();
               _passwordController.clear();
+
+              // Lógica para iniciar sesión
             },
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white, backgroundColor: Colors.black,
+              side: BorderSide(color: Colors.red), // Borde rojo
+            ),
             child: Text('Iniciar sesión'),
           ),
           SizedBox(height: 20.0),
@@ -48,9 +58,13 @@ class _LoginFormState extends State<LoginForm> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CreateUserPage()),
+                MaterialPageRoute(builder: (context) => CreatePage()),
               );
             },
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white, backgroundColor: Colors.black,
+              side: BorderSide(color: Colors.red), // Borde rojo
+            ),
             child: Text('Crear usuario'),
           ),
         ],
