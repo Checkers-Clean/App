@@ -1,5 +1,3 @@
-import 'package:checker/GameSreen.dart';
-import 'package:checker/Login/loginForm.dart';
 import 'package:checker/Login/loginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:checker/appData.dart';
@@ -12,9 +10,11 @@ class CreateUserPage extends StatelessWidget {
       TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
+  CreateUserPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    var appData = Provider.of<AppData>(context);
+    //var appData = Provider.of<AppData>(context);
 
     return Padding(
       padding: EdgeInsets.all(20.0),
@@ -23,26 +23,38 @@ class CreateUserPage extends StatelessWidget {
         children: <Widget>[
           TextField(
             controller: _usernameController,
-            decoration: InputDecoration(labelText: 'Usuario'),
+            decoration: const InputDecoration(labelText: 'Usuario'),
+            style: const TextStyle(
+              fontFamily: 'Roboto', // Establece la fuente como Roboto
+            ),
           ),
-          SizedBox(height: 20.0),
+          const SizedBox(height: 20.0),
           TextField(
             controller: _passwordController,
-            decoration: InputDecoration(labelText: 'Contraseña'),
+            decoration: const InputDecoration(labelText: 'Contraseña'),
+            style: const TextStyle(
+              fontFamily: 'Roboto', // Establece la fuente como Roboto
+            ),
             obscureText: true,
           ),
-          SizedBox(height: 20.0),
+          const SizedBox(height: 20.0),
           TextField(
             controller: _repeatPasswordController,
-            decoration: InputDecoration(labelText: 'Repetir Contraseña'),
+            decoration: const InputDecoration(labelText: 'Repetir Contraseña'),
+            style: const TextStyle(
+              fontFamily: 'Roboto', // Establece la fuente como Roboto
+            ),
             obscureText: true,
           ),
-          SizedBox(height: 20.0),
+          const SizedBox(height: 20.0),
           TextField(
             controller: _emailController,
-            decoration: InputDecoration(labelText: 'Correo'),
+            decoration: const InputDecoration(labelText: 'Correo'),
+            style: const TextStyle(
+              fontFamily: 'Roboto', // Establece la fuente como Roboto
+            ),
           ),
-          SizedBox(height: 20.0),
+          const SizedBox(height: 20.0),
           ElevatedButton(
             onPressed: () {
               Provider.of<AppData>(context, listen: false).CreateUser(
@@ -62,10 +74,15 @@ class CreateUserPage extends StatelessWidget {
               );
             },
             style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.white, backgroundColor: Colors.black,
+              foregroundColor: Colors.grey, backgroundColor: Colors.black,
               side: BorderSide(color: Colors.red), // Borde rojo
             ),
-            child: Text('Crear usuario'),
+            child: const Text(
+              'Crear usuario',
+              style: TextStyle(
+                fontFamily: 'Roboto', // Establece la fuente como Roboto
+              ),
+            ),
           ),
         ],
       ),

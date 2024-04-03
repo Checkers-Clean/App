@@ -1,6 +1,5 @@
 import 'package:checker/CreateUser/createUserForm.dart';
 import 'package:flutter/material.dart';
-import '../Login/loginForm.dart';
 
 class CreatePage extends StatelessWidget {
   @override
@@ -8,7 +7,7 @@ class CreatePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Crear Usuario',
-            style: TextStyle(color: Colors.white)), // Color del texto blanco
+            style: TextStyle(color: Colors.grey)), // Color del texto blanco
         backgroundColor: Colors.black, // Fondo negro
         elevation: 0, // Elimina la sombra de la barra de aplicación
       ),

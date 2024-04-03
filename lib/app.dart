@@ -1,5 +1,3 @@
-import 'package:checker/GameSreen.dart';
-import 'package:checker/MainMenu/mainMenuForm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'MainMenu/maniManuPage.dart';
@@ -23,20 +21,20 @@ class AppState extends State<App> {
         primaryColor: Colors.black, // Color de fondo de la barra de navegación
         scaffoldBackgroundColor: Colors.black, // Color de fondo de la pantalla
         textTheme: const TextTheme(
-          bodyText1: TextStyle(color: Colors.white), // Color del texto
-          bodyText2: TextStyle(color: Colors.white), // Color del texto
+          bodyText1: TextStyle(color: Colors.grey), // Color del texto
+          bodyText2: TextStyle(color: Colors.grey), // Color del texto
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.black, // Color del botón
-            textStyle:
-                TextStyle(color: Colors.white), // Color del texto del botón
+            textStyle: const TextStyle(
+                color: Colors.grey), // Color del texto del botón
           ),
         ),
         inputDecorationTheme: const InputDecorationTheme(
           labelStyle: TextStyle(
               color:
-                  Colors.white), // Color del texto de las etiquetas de entrada
+                  Colors.grey), // Color del texto de las etiquetas de entrada
           hintStyle: TextStyle(
               color: Colors.grey), // Color del texto de sugerencia de entrada
           enabledBorder: OutlineInputBorder(
@@ -44,8 +42,8 @@ class AppState extends State<App> {
                 color: Colors.grey), // Color del borde cuando está habilitado
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-                color: Colors.red), // Color del borde cuando está enfocado
+            borderSide: BorderSide(color: Colors.red),
+            // Color del borde cuando está enfocado
           ),
         ),
       ),
