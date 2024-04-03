@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class AppData extends ChangeNotifier {
-  static List<List<String>> numeracion = [
+  List<List<String>> numeracion = [
     ['a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1'],
     ['a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2'],
     ['a3', 'b3', 'c3', 'd3', 'e3', 'f3', 'g3', 'h3'],
@@ -18,7 +18,7 @@ class AppData extends ChangeNotifier {
     ['a7', 'b7', 'c7', 'd7', 'e7', 'f7', 'g7', 'h7'],
     ['a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8']
   ];
-  static List<List<String>> board_inicio = [
+  List<List<String>> board_inicio = [
     ['r1', '-', 'r2', '-', 'r3', '-', 'r4', '-'],
     ['-', 'r5', '-', 'r6', '-', 'r7', '-', 'r8'],
     ['r9', '-', 'r10', '-', 'r11', '-', 'r12', '-'],
@@ -28,7 +28,7 @@ class AppData extends ChangeNotifier {
     ['n8', '-', 'n7', '-', 'n6', '-', 'n5', '-'],
     ['-', 'n4', '-', 'n3', '-', 'n2', '-', 'n1']
   ];
-  static List<List<String>> board = [
+  List<List<String>> board = [
     ['r1', '-', 'r2', '-', 'r3', '-', 'r4', '-'],
     ['-', 'r5', '-', 'r6', '-', 'r7', '-', 'r8'],
     ['r9', '-', 'r10', '-', 'r11', '-', 'r12', '-'],
@@ -39,7 +39,7 @@ class AppData extends ChangeNotifier {
     ['-', 'n4', '-', 'n3', '-', 'n2', '-', 'n1']
   ];
 
-  static List<List<String>> piezasRojas = [
+  List<List<String>> fichasRojas = [
     ['r1', 'a1'],
     ['r2', 'c1'],
     ['r3', 'e1'],
@@ -54,7 +54,7 @@ class AppData extends ChangeNotifier {
     ['r12', 'g3']
   ];
 
-  static List<List<String>> piezasNegras = [
+  List<List<String>> fichasNegras = [
     ['n1', 'a6'],
     ['n2', 'c6'],
     ['n3', 'e6'],
@@ -69,13 +69,13 @@ class AppData extends ChangeNotifier {
     ['n12', 'g8']
   ];
 
-  static void printerboard() {
+  void printerboard() {
     for (var fila = 0; fila < board.length; fila++) {
       print(board[fila]);
     }
   }
 
-  static void colocarfichas(List<List<String>> piezas, String piezaSelecionada,
+  void colocarfichas(List<List<String>> piezas, String piezaSelecionada,
       String nuevaPosicion) {
     for (var fila = 0; fila < board.length; fila++) {
       for (var columna = 0; columna < board[fila].length; columna++) {
@@ -87,6 +87,7 @@ class AppData extends ChangeNotifier {
           int nuevaColumna = nuevaPosicion.codeUnitAt(0) - 'a'.codeUnitAt(0);
           // Colocar la pieza en la nueva posición
           board[nuevaFila][nuevaColumna] = piezaSelecionada;
+          notifyListeners();
           // Imprimir el tablero actualizado
           for (var filaTablero in board) {
             print(filaTablero);
@@ -97,7 +98,7 @@ class AppData extends ChangeNotifier {
     }
   }
 
-  static bool esMovimientoValido(String posicionInicial, String posicionFinal) {
+  bool esMovimientoValido(String posicionInicial, String posicionFinal) {
     // Obtener las coordenadas de la posición inicial y final
     int filaInicial = int.parse(posicionInicial[1]);
     int columnaInicial = posicionInicial.codeUnitAt(0) - 'a'.codeUnitAt(0);

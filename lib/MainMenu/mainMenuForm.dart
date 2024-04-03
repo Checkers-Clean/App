@@ -1,4 +1,4 @@
-import 'package:checker/GameSreen.dart';
+import 'package:checker/Game/gamePage.dart';
 import 'package:flutter/material.dart';
 
 class MainMenuForm extends StatefulWidget {
@@ -77,7 +77,7 @@ class _MainMenuFormState extends State<MainMenuForm> {
                 // Acción del primer botón
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => GameScreen()),
+                  MaterialPageRoute(builder: (context) => GamePage()),
                 );
               },
               style: ElevatedButton.styleFrom(

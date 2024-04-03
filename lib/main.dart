@@ -6,17 +6,6 @@ import 'app.dart';
 import 'appData.dart';
 
 void main() async {
-  print("--------m0---------");
-  AppData.printerboard();
-  print("--------m0---------");
-  AppData.colocarfichas(AppData.piezasRojas, "r12", "h4");
-  print("--------m1---------");
-  AppData.printerboard();
-  print("--------m1---------");
-  AppData.colocarfichas(AppData.piezasRojas, "n12", "a5");
-  print("--------m2---------");
-  AppData.printerboard();
-  print("--------m2---------");
   // For Linux, macOS and Windows, initialize WindowManager
   try {
     if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
