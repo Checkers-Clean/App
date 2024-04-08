@@ -96,6 +96,7 @@ class _GameFormState extends State<GameForm> {
 
         // Verificar si se ha acabado el juego
         if (appData.red == 0 || appData.black == 0) {
+          appData.board == appData.board_inicio;
           String winner = appData.red == 0 ? "black" : "red";
           _showGameOverDialog(context, winner);
         }
@@ -118,7 +119,8 @@ class _GameFormState extends State<GameForm> {
             TextButton(
               child: Text("OK"),
               onPressed: () {
-                Navigator.of(context).pop(); // Cerrar el diálogo
+                Navigator.of(context).pop();
+                // Cerrar el diálogo
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                       builder: (context) =>
