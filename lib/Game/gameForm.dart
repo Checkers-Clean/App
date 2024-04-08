@@ -54,9 +54,9 @@ class _GameFormState extends State<GameForm> {
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          // Manejo del clic
           contTap++;
           _handleSquareClick(position, piece, contTap, appData);
+          print(contTap);
         },
         child: Container(
           color: isWhite ? Colors.white : Colors.black,
@@ -65,7 +65,7 @@ class _GameFormState extends State<GameForm> {
           child: Center(
             child: Text(
               piece,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.red, // Color de las piezas
                 fontSize: 20,
               ),
@@ -77,22 +77,24 @@ class _GameFormState extends State<GameForm> {
   }
 
   void _handleSquareClick(
-      String position, String piece, int contTap, AppData appData) {
-    if (contTap == 1) {
+      String position, String piece, int count, AppData appData) {
+    if (count == 1) {
       setState(() {
         tap1.add(position);
         tap1.add(piece);
       });
     }
-    if (contTap == 2) {
+    if (count == 2) {
       setState(() {
         tap2.add(position);
         tap2.add(piece);
 
-        //appData.colocarfichas(piezas, piezaSelecionada, nuevaPosicion)
-        contTap = 0;
         print(
             "-------\n tap1 : ${tap1[0]}, ${tap1[1]}\n tap2 ${tap2[0]}, ${tap2[1]}\n-------");
+        appData.colocarfichas(tap1[1], tap1[0], tap2[0]);
+        contTap = 0;
+        tap1.clear();
+        tap2.clear();
       });
     }
   }

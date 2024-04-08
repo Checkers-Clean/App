@@ -75,24 +75,21 @@ class AppData extends ChangeNotifier {
     }
   }
 
-  void colocarfichas(List<List<String>> piezas, String piezaSelecionada,
-      String nuevaPosicion) {
-    for (var fila = 0; fila < board.length; fila++) {
-      for (var columna = 0; columna < board[fila].length; columna++) {
-        if (board[fila][columna] == piezaSelecionada) {
-          // Cambiar la posición de la pieza en el tablero
-          board[fila][columna] = '-';
-          // Encontrar las coordenadas de la nueva posición
-          int nuevaFila = int.parse(nuevaPosicion[1]) - 1;
-          int nuevaColumna = nuevaPosicion.codeUnitAt(0) - 'a'.codeUnitAt(0);
-          // Colocar la pieza en la nueva posición
-          board[nuevaFila][nuevaColumna] = piezaSelecionada;
-          notifyListeners();
-          // Imprimir el tablero actualizado
-          for (var filaTablero in board) {
-            print(filaTablero);
+  void colocarfichas(
+      String piezaSelecionada, String posicionActual, String nuevaPosicion) {
+    if (esMovimientoValido(posicionActual, nuevaPosicion)) {
+      for (var fila = 0; fila < board.length; fila++) {
+        for (var columna = 0; columna < board[fila].length; columna++) {
+          if (board[fila][columna] == piezaSelecionada) {
+            // Cambiar la posición de la pieza en el tablero
+            board[fila][columna] = '-';
+            // Encontrar las coordenadas de la nueva posición
+            int nuevaFila = int.parse(nuevaPosicion[1]) - 1;
+            int nuevaColumna = nuevaPosicion.codeUnitAt(0) - 'a'.codeUnitAt(0);
+            // Colocar la pieza en la nueva posición
+            board[nuevaFila][nuevaColumna] = piezaSelecionada;
+            notifyListeners();
           }
-          return;
         }
       }
     }
@@ -130,16 +127,44 @@ class AppData extends ChangeNotifier {
 
   bool validate = false;
 
-  void saveUser(String username, String password) {
-    this.username = username;
-    this.password = password;
-    loginUser("localhost:3000", username, password);
-  }
-
   void CreateUser(String new_username, String new_password, String new_email) {
     this.new_username = new_username;
     this.new_password = new_password;
     this.new_email = new_email;
+    CreateUserSend("localhost:3000", new_username, new_password, new_email);
+  }
+
+  Future<void> CreateUserSend(
+      String serverUrl, String username, String password, String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://$serverUrl/CreateUser'),
+        body: {
+          'username': username,
+          'password': password,
+          'email': email,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Procesar la respuesta si es exitosa
+        print('Usuario Creado');
+
+        notifyListeners();
+      } else {
+        // Manejar errores si la solicitud no es exitosa
+        print('Error al autenticar usuario');
+      }
+    } catch (error) {
+      // Manejar errores de conexión
+      print('Error de conexión: $error');
+    }
+  }
+
+  void saveUser(String username, String password) {
+    this.username = username;
+    this.password = password;
+    loginUser("localhost:3000", username, password);
   }
 
   Future<void> loginUser(
