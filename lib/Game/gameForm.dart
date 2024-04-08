@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../MainMenu/maniManuPage.dart';
 import '../appData.dart';
 
 class GameForm extends StatefulWidget {
@@ -91,11 +92,45 @@ class _GameFormState extends State<GameForm> {
 
         print(
             "-------\n tap1 : ${tap1[0]}, ${tap1[1]}\n tap2 ${tap2[0]}, ${tap2[1]}\n-------");
-        appData.colocarfichas(tap1[1], tap1[0], tap2[0]);
+        appData.colocarfichas(tap1[1], tap1[0], tap2[0], tap2[1]);
+
+        // Verificar si se ha acabado el juego
+        if (appData.red == 0 || appData.black == 0) {
+          String winner = appData.red == 0 ? "black" : "red";
+          _showGameOverDialog(context, winner);
+        }
+
         contTap = 0;
         tap1.clear();
         tap2.clear();
       });
     }
+  }
+
+  void _showGameOverDialog(BuildContext context, String winner) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Game Over"),
+          content: Text("Winner: $winner"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Cerrar el diálogo
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MainMenuPage()), // Navegar a MainMenuPage
+                  (Route<dynamic> route) =>
+                      false, // Eliminar las rutas anteriores
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

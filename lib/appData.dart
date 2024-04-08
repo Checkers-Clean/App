@@ -8,6 +8,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class AppData extends ChangeNotifier {
+  // Variables de inicio de sesion
+  String? username;
+  String? password;
+
+  String? new_username;
+  String? new_password;
+  String? new_email;
+
+  bool validate = false;
+  // fin de variable de inicio de session
+
+  // Variables de juego
+  int red = 1;
+  int black = 1;
+  int turno = 0;
+  int racha = 0;
+
   List<List<String>> numeracion = [
     ['a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1'],
     ['a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2'],
@@ -69,63 +86,159 @@ class AppData extends ChangeNotifier {
     ['n12', 'g8']
   ];
 
+  //fin de Variables de juego
+
+  // Funciones de juego
   void printerboard() {
     for (var fila = 0; fila < board.length; fila++) {
       print(board[fila]);
     }
   }
 
-  void colocarfichas(
-      String piezaSelecionada, String posicionActual, String nuevaPosicion) {
-    if (esMovimientoValido(posicionActual, nuevaPosicion)) {
-      for (var fila = 0; fila < board.length; fila++) {
-        for (var columna = 0; columna < board[fila].length; columna++) {
-          if (board[fila][columna] == piezaSelecionada) {
-            // Cambiar la posición de la pieza en el tablero
-            board[fila][columna] = '-';
-            // Encontrar las coordenadas de la nueva posición
-            int nuevaFila = int.parse(nuevaPosicion[1]) - 1;
-            int nuevaColumna = nuevaPosicion.codeUnitAt(0) - 'a'.codeUnitAt(0);
-            // Colocar la pieza en la nueva posición
-            board[nuevaFila][nuevaColumna] = piezaSelecionada;
-            notifyListeners();
-          }
+  void colocarfichas(String piezaSelecionada, String posicionActual,
+      String nuevaPosicion, String nuevaPosicionNombre) {
+    if (piezaSelecionada != "-" && nuevaPosicionNombre == "-") {
+      if (piezaSelecionada != nuevaPosicionNombre &&
+          esMovimientoValido(piezaSelecionada, posicionActual, nuevaPosicion,
+              numeracion, board)) {
+        if (turno % 2 == 0 && piezaSelecionada.contains("r")) {
+          hacermov(piezaSelecionada, nuevaPosicion);
+          turno++;
+        }
+        if (turno % 2 != 0 && piezaSelecionada.contains("n")) {
+          hacermov(piezaSelecionada, nuevaPosicion);
+          turno++;
+        }
+        if (red == 0) {}
+        if (black == 0) {}
+      }
+    }
+  }
+
+  void hacermov(String piezaSelecionada, String nuevaPosicion) {
+    for (var fila = 0; fila < board.length; fila++) {
+      for (var columna = 0; columna < board[fila].length; columna++) {
+        if (board[fila][columna] == piezaSelecionada) {
+          // Cambiar la posición de la pieza en el tablero
+          board[fila][columna] = '-';
+          // Encontrar las coordenadas de la nueva posición
+          int nuevaFila = int.parse(nuevaPosicion[1]) - 1;
+          int nuevaColumna = nuevaPosicion.codeUnitAt(0) - 'a'.codeUnitAt(0);
+          // Colocar la pieza en la nueva posición
+          board[nuevaFila][nuevaColumna] = piezaSelecionada;
+          notifyListeners();
         }
       }
     }
   }
 
-  bool esMovimientoValido(String posicionInicial, String posicionFinal) {
+  bool esMovimentoBack(String ficha, int filaInicial, int columnaInicial,
+      int filaFinal, int columnaFinal) {
+    if (ficha.contains("r")) {
+      if (filaInicial > filaFinal) {
+        return true;
+      }
+    }
+    if (ficha.contains("N")) {
+      if (filaFinal > filaInicial) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool esPosibleMovimientoEnDiagonal(String ficha, String posicion,
+      List<List<String>> numeracion, List<List<String>> tablero) {
+    // Obtener las coordenadas de la posición
+    int fila = numeracion.indexWhere((fila) => fila.contains(posicion));
+    int columna = numeracion[fila].indexOf(posicion);
+
+    // Verificar si es posible realizar el movimiento en alguna dirección diagonal
+    for (int i = -1; i <= 1; i += 2) {
+      for (int j = -1; j <= 1; j += 2) {
+        // Calcular la posición final en la diagonal actual
+        int filaFinal = fila + i * 2;
+        int columnaFinal = columna + j * 2;
+
+        // Verificar si la posición final está dentro del tablero
+        if (filaFinal >= 0 &&
+            filaFinal < numeracion.length &&
+            columnaFinal >= 0 &&
+            columnaFinal < numeracion[filaFinal].length) {
+          // Verificar si hay una ficha en la posición intermedia
+          int filaIntermedia = fila + i;
+          int columnaIntermedia = columna + j;
+          if (tablero[filaIntermedia][columnaIntermedia] != "-") {
+            // Verificar si la ficha es "r" y la posición final es mayor o igual que la inicial
+            if (ficha == "r" && filaFinal >= fila) {
+              return false; // No es posible realizar el movimiento en esta dirección diagonal
+            }
+            // Verificar si la ficha es "n" y la posición final es menor que la inicial
+            if (ficha == "n" && filaFinal <= fila) {
+              return false; // No es posible realizar el movimiento en esta dirección diagonal
+            }
+            return true; // Se puede realizar el movimiento en esta dirección diagonal
+          }
+        }
+      }
+    }
+
+    return false; // No es posible realizar el movimiento en ninguna dirección diagonal
+  }
+
+  bool esMovimientoValido(String ficha, posicionInicial, String posicionFinal,
+      List<List<String>> numeracion, List<List<String>> tablero) {
     // Obtener las coordenadas de la posición inicial y final
-    int filaInicial = int.parse(posicionInicial[1]);
-    int columnaInicial = posicionInicial.codeUnitAt(0) - 'a'.codeUnitAt(0);
-    int filaFinal = int.parse(posicionFinal[1]);
-    int columnaFinal = posicionFinal.codeUnitAt(0) - 'a'.codeUnitAt(0);
+    int filaInicial =
+        numeracion.indexWhere((fila) => fila.contains(posicionInicial));
+    int columnaInicial = numeracion[filaInicial].indexOf(posicionInicial);
+    int filaFinal =
+        numeracion.indexWhere((fila) => fila.contains(posicionFinal));
+    int columnaFinal = numeracion[filaFinal].indexOf(posicionFinal);
 
     // Calcular la diferencia entre las filas y columnas
+    esMovimentoBack(
+        ficha, filaInicial, columnaInicial, filaFinal, columnaFinal);
     int difFilas = (filaFinal - filaInicial).abs();
     int difColumnas = (columnaFinal - columnaInicial).abs();
 
     // Verificar si el movimiento es diagonal
-    if (difFilas == difColumnas) {
+    if (difFilas == difColumnas &&
+        !esMovimentoBack(
+            ficha, filaInicial, columnaInicial, filaFinal, columnaFinal)) {
       // Verificar si el movimiento es válido según las reglas del juego
+      print('diferencia de filas $difFilas');
       if (difFilas == 1) {
         return true; // Movimiento válido en diagonal
       }
+      if (difFilas == 2) {
+        // Calcular las coordenadas de la casilla intermedia
+        int filaIntermedia = (filaInicial + filaFinal) ~/ 2;
+        int columnaIntermedia = (columnaInicial + columnaFinal) ~/ 2;
+
+        // Verificar si la casilla intermedia contiene una ficha
+        if (tablero[filaIntermedia][columnaIntermedia] != "-") {
+          if (tablero[filaIntermedia][columnaIntermedia].startsWith("r")) {
+            red--;
+          }
+          if (tablero[filaIntermedia][columnaIntermedia].startsWith("n")) {
+            black--;
+          }
+
+          // Actualizar el tablero: la casilla intermedia se convierte en "-"
+          tablero[filaIntermedia][columnaIntermedia] = "-";
+          racha++;
+          return true; // Movimiento válido en diagonal con casilla intermedia ocupada
+        }
+      }
     }
 
-    // Si no es un movimiento válido en diagonal
-    return false;
+    return false; // Movimiento inválido
   }
 
-  String? username;
-  String? password;
+  // Fin de variables de juego
 
-  String? new_username;
-  String? new_password;
-  String? new_email;
-
-  bool validate = false;
+  // Funciones de inicio de session
 
   void CreateUser(String new_username, String new_password, String new_email) {
     this.new_username = new_username;
@@ -193,3 +306,5 @@ class AppData extends ChangeNotifier {
     }
   }
 }
+
+// Fin de Funciones de inicio de session
