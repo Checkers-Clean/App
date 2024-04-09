@@ -2,6 +2,7 @@ import 'package:checker/Game/gamePage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../GameOnline/gameOnlinePage.dart';
 import '../appData.dart';
 
 class MainMenuForm extends StatefulWidget {
@@ -120,7 +121,10 @@ class _MainMenuFormState extends State<MainMenuForm> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Acción del tercer botón
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => GameOnlinePage()),
+                );
               },
               style: ElevatedButton.styleFrom(
                 minimumSize:

@@ -21,11 +21,13 @@ class AppData extends ChangeNotifier {
   // fin de variable de inicio de session
 
   // Variables de juego
-  int red = 1;
-  int black = 1;
+  String turnoActual = "Red";
+  int red = 12;
+  int black = 12;
   int turno = 0;
-  int racha = 0;
+  bool racha = false;
   bool gameover = false;
+  bool queen = false;
 
   List<List<String>> numeracion = [
     ['a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1'],
@@ -93,10 +95,10 @@ class AppData extends ChangeNotifier {
   // Funciones de juego
   void reset() {
     gameover = false;
-    red = 1;
-    black = 1;
+    red = 12;
+    black = 12;
     turno = 0;
-    racha = 0;
+    racha = false;
     board = board_inicio;
     print("fichas rojas $red, fichas negras $black");
   }
@@ -115,14 +117,21 @@ class AppData extends ChangeNotifier {
               numeracion, board)) {
         if (turno % 2 == 0 && piezaSelecionada.contains("r")) {
           hacermov(piezaSelecionada, nuevaPosicion);
-          turno++;
+          if (!racha) {
+            turno++;
+            turnoActual = "Black";
+          }
         }
         if (turno % 2 != 0 && piezaSelecionada.contains("n")) {
           hacermov(piezaSelecionada, nuevaPosicion);
-          turno++;
+          if (!racha) {
+            turno++;
+            turnoActual = "Red";
+          }
         }
       }
     }
+
     if (red == 0 || black == 0) {
       gameover = true;
     }
@@ -141,18 +150,24 @@ class AppData extends ChangeNotifier {
 
           // Verificar si la posición final es la fila 1 y la pieza contiene "n"
           if (nuevaFila == 0 && piezaSelecionada.contains('n')) {
-            print("reina");
-            piezaSelecionada = "Q" + piezaSelecionada;
+            if (!piezaSelecionada.contains("Q")) {
+              piezaSelecionada = "Q" + piezaSelecionada;
+              queen = true;
+            }
           }
 
           // Verificar si la posición final es la fila 8 y la pieza contiene "r"
           if (nuevaFila == 7 && piezaSelecionada.contains('r')) {
-            // Realizar una acción específica
-            // Por ejemplo, eliminar la pieza
-            // board[nuevaFila][nuevaColumna] = '-';
-            piezaSelecionada = "Q" + piezaSelecionada;
+            if (!piezaSelecionada.contains("Q")) {
+              piezaSelecionada = "Q" + piezaSelecionada;
+              queen = true;
+            }
           }
           board[nuevaFila][nuevaColumna] = piezaSelecionada;
+          if (queen) {
+            racha = false;
+            queen = false;
+          }
 
           notifyListeners();
         }
@@ -175,47 +190,12 @@ class AppData extends ChangeNotifier {
     return false;
   }
 
-  bool esPosibleMovimientoEnDiagonal(String ficha, String posicion,
-      List<List<String>> numeracion, List<List<String>> tablero) {
-    // Obtener las coordenadas de la posición
-    int fila = numeracion.indexWhere((fila) => fila.contains(posicion));
-    int columna = numeracion[fila].indexOf(posicion);
-
-    // Verificar si es posible realizar el movimiento en alguna dirección diagonal
-    for (int i = -1; i <= 1; i += 2) {
-      for (int j = -1; j <= 1; j += 2) {
-        // Calcular la posición final en la diagonal actual
-        int filaFinal = fila + i * 2;
-        int columnaFinal = columna + j * 2;
-
-        // Verificar si la posición final está dentro del tablero
-        if (filaFinal >= 0 &&
-            filaFinal < numeracion.length &&
-            columnaFinal >= 0 &&
-            columnaFinal < numeracion[filaFinal].length) {
-          // Verificar si hay una ficha en la posición intermedia
-          int filaIntermedia = fila + i;
-          int columnaIntermedia = columna + j;
-          if (tablero[filaIntermedia][columnaIntermedia] != "-") {
-            // Verificar si la ficha es "r" y la posición final es mayor o igual que la inicial
-            if (ficha == "r" && filaFinal >= fila) {
-              return false; // No es posible realizar el movimiento en esta dirección diagonal
-            }
-            // Verificar si la ficha es "n" y la posición final es menor que la inicial
-            if (ficha == "n" && filaFinal <= fila) {
-              return false; // No es posible realizar el movimiento en esta dirección diagonal
-            }
-            return true; // Se puede realizar el movimiento en esta dirección diagonal
-          }
-        }
-      }
-    }
-
-    return false; // No es posible realizar el movimiento en ninguna dirección diagonal
-  }
-
-  bool esMovimientoValido(String ficha, posicionInicial, String posicionFinal,
-      List<List<String>> numeracion, List<List<String>> tablero) {
+  bool esPosibleSeguir(
+      String ficha,
+      String posicionInicial,
+      String posicionFinal,
+      List<List<String>> numeracion,
+      List<List<String>> tablero) {
     // Obtener las coordenadas de la posición inicial y final
     int filaInicial =
         numeracion.indexWhere((fila) => fila.contains(posicionInicial));
@@ -223,40 +203,108 @@ class AppData extends ChangeNotifier {
     int filaFinal =
         numeracion.indexWhere((fila) => fila.contains(posicionFinal));
     int columnaFinal = numeracion[filaFinal].indexOf(posicionFinal);
-
-    // Calcular la diferencia entre las filas y columnas
     esMovimentoBack(
         ficha, filaInicial, columnaInicial, filaFinal, columnaFinal);
+    // Calcular la diferencia entre las filas y columnas
     int difFilas = (filaFinal - filaInicial).abs();
     int difColumnas = (columnaFinal - columnaInicial).abs();
+    print("lado 1: " + tablero[difFilas + 1][difColumnas + 1]);
+    print("lado 1: " + tablero[difFilas + 1][difColumnas + 1]);
 
-    // Verificar si el movimiento es diagonal
-    if (difFilas == difColumnas &&
-        !esMovimentoBack(
-            ficha, filaInicial, columnaInicial, filaFinal, columnaFinal)) {
-      // Verificar si el movimiento es válido según las reglas del juego
-      print('diferencia de filas $difFilas');
-      if (difFilas == 1) {
-        return true; // Movimiento válido en diagonal
+    return false;
+  }
+
+  bool esMovimientoValido(
+      String ficha,
+      String posicionInicial,
+      String posicionFinal,
+      List<List<String>> numeracion,
+      List<List<String>> tablero) {
+    // Obtener las coordenadas de la posición inicial y final
+    int filaInicial =
+        numeracion.indexWhere((fila) => fila.contains(posicionInicial));
+    int columnaInicial = numeracion[filaInicial].indexOf(posicionInicial);
+    int filaFinal =
+        numeracion.indexWhere((fila) => fila.contains(posicionFinal));
+    int columnaFinal = numeracion[filaFinal].indexOf(posicionFinal);
+    esMovimentoBack(
+        ficha, filaInicial, columnaInicial, filaFinal, columnaFinal);
+    // Calcular la diferencia entre las filas y columnas
+    int difFilas = (filaFinal - filaInicial).abs();
+    int difColumnas = (columnaFinal - columnaInicial).abs();
+    if (ficha.contains("Q")) {
+      if (difFilas == difColumnas) {
+        if (difFilas == 1) {
+          if (racha) {
+            return false;
+          }
+          return true; // Movimiento válido en diagonal
+        } else {
+          // Verificar casillas intermedias en movimientos diagonales
+          int pasoFila = (filaFinal - filaInicial).sign;
+          int pasoColumna = (columnaFinal - columnaInicial).sign;
+          for (int i = 1; i < difFilas; i++) {
+            int filaIntermedia = filaInicial + pasoFila * i;
+            int columnaIntermedia = columnaInicial + pasoColumna * i;
+
+            if (tablero[filaIntermedia][columnaIntermedia] != "-") {
+              if (tablero[filaIntermedia][columnaIntermedia].startsWith("r")) {
+                red--;
+              }
+              if (tablero[filaIntermedia][columnaIntermedia].startsWith("n")) {
+                black--;
+              }
+              // Actualizar el tablero: la casilla intermedia se convierte en "-"
+              tablero[filaIntermedia][columnaIntermedia] = "-";
+
+              racha = true;
+
+              return true; // Movimiento válido con casilla intermedia ocupada
+            } else {
+              racha = false;
+            }
+          }
+          return true; // Movimiento válido en diagonal
+        }
       }
-      if (difFilas == 2) {
-        // Calcular las coordenadas de la casilla intermedia
-        int filaIntermedia = (filaInicial + filaFinal) ~/ 2;
-        int columnaIntermedia = (columnaInicial + columnaFinal) ~/ 2;
-
-        // Verificar si la casilla intermedia contiene una ficha
-        if (tablero[filaIntermedia][columnaIntermedia] != "-") {
-          if (tablero[filaIntermedia][columnaIntermedia].startsWith("r")) {
-            red--;
+    } else {
+      // Verificar si el movimiento es diagonal
+      if (difFilas == difColumnas &&
+          !esMovimentoBack(
+              ficha, filaInicial, columnaInicial, filaFinal, columnaFinal)) {
+        // Verificar si el movimiento es válido según las reglas del juego
+        print('diferencia de filas $difFilas');
+        if (difFilas == 1) {
+          if (racha) {
+            return false;
           }
-          if (tablero[filaIntermedia][columnaIntermedia].startsWith("n")) {
-            black--;
-          }
+          return true; // Movimiento válido en diagonal
+        }
+        if (difFilas == 2) {
+          // Calcular las coordenadas de la casilla intermedia
+          int filaIntermedia = (filaInicial + filaFinal) ~/ 2;
+          int columnaIntermedia = (columnaInicial + columnaFinal) ~/ 2;
+          print("intermedio: " + tablero[filaIntermedia][columnaIntermedia]);
 
-          // Actualizar el tablero: la casilla intermedia se convierte en "-"
-          tablero[filaIntermedia][columnaIntermedia] = "-";
-          racha++;
-          return true; // Movimiento válido en diagonal con casilla intermedia ocupada
+          // Verificar si la casilla intermedia contiene una ficha
+          if (tablero[filaIntermedia][columnaIntermedia] != "-") {
+            if (tablero[filaIntermedia][columnaIntermedia].startsWith("r")) {
+              red--;
+              racha = true;
+            }
+            if (tablero[filaIntermedia][columnaIntermedia].startsWith("n")) {
+              black--;
+              racha = true;
+            }
+
+            // Actualizar el tablero: la casilla intermedia se convierte en "-"
+            tablero[filaIntermedia][columnaIntermedia] = "-";
+            esPosibleSeguir(
+                ficha, posicionInicial, posicionFinal, numeracion, tablero);
+            return true; // Movimiento válido en diagonal con casilla intermedia ocupada
+          }
+        } else {
+          racha = false;
         }
       }
     }
@@ -279,7 +327,7 @@ class AppData extends ChangeNotifier {
       String serverUrl, String username, String password, String email) async {
     try {
       final response = await http.post(
-        Uri.parse('http://$serverUrl/CreateUser'),
+        Uri.parse('http://$serverUrl/createUser'),
         body: {
           'username': username,
           'password': password,
@@ -334,6 +382,9 @@ class AppData extends ChangeNotifier {
     }
   }
 
+// Fin de Funciones de inicio de session
+
+// Funciones de jugabilidad en linea
   Future<void> enviarMove(
       String serverUrl, String posicion, String password) async {
     try {
@@ -359,7 +410,26 @@ class AppData extends ChangeNotifier {
       print('Error de conexión: $error');
     }
   }
+
+  Future<void> recivirTurno(
+      String serverUrl, String posicion, String password) async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://$serverUrl/api/game/iniciarPartida'),
+      );
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonResponse = json.decode(response.body);
+
+        String turno = jsonResponse['turn'];
+        turnoActual = turno;
+
+        print('Turno recibido: $turno');
+      } else {
+        print('Error al recibir turno del servidor');
+      }
+    } catch (error) {
+      // Manejar errores de conexión
+      print('Error de conexión: $error');
+    }
+  }
 }
-
-
-// Fin de Funciones de inicio de session

@@ -3,12 +3,12 @@ import 'package:provider/provider.dart';
 import '../MainMenu/maniManuPage.dart';
 import '../appData.dart';
 
-class GameForm extends StatefulWidget {
+class GameOnlineForm extends StatefulWidget {
   @override
-  _GameFormState createState() => _GameFormState();
+  _GameOnlineFormState createState() => _GameOnlineFormState();
 }
 
-class _GameFormState extends State<GameForm> {
+class _GameOnlineFormState extends State<GameOnlineForm> {
   late int contTap = 0;
   late List<String> tap1 = [];
   late List<String> tap2 = [];
