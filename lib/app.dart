@@ -47,6 +47,7 @@ class AppState extends State<App> {
           ),
         ),
       ),
+      debugShowCheckedModeBanner: false,
       home: appData.validate ? MainMenuPage() : LoginPage(),
     );
   }

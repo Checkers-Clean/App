@@ -1,5 +1,8 @@
 import 'package:checker/Game/gamePage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../appData.dart';
 
 class MainMenuForm extends StatefulWidget {
   @override
@@ -23,7 +26,8 @@ class _MainMenuFormState extends State<MainMenuForm> {
 
   @override
   Widget build(BuildContext context) {
-    //var appData = Provider.of<AppData>(context);
+    var appData = Provider.of<AppData>(context);
+    appData.board == appData.board_inicio;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

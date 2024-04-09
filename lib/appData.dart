@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -24,6 +25,7 @@ class AppData extends ChangeNotifier {
   int black = 1;
   int turno = 0;
   int racha = 0;
+  bool gameover = false;
 
   List<List<String>> numeracion = [
     ['a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1'],
@@ -89,6 +91,16 @@ class AppData extends ChangeNotifier {
   //fin de Variables de juego
 
   // Funciones de juego
+  void reset() {
+    gameover = false;
+    red = 1;
+    black = 1;
+    turno = 0;
+    racha = 0;
+    board = board_inicio;
+    print("fichas rojas $red, fichas negras $black");
+  }
+
   void printerboard() {
     for (var fila = 0; fila < board.length; fila++) {
       print(board[fila]);
@@ -109,9 +121,10 @@ class AppData extends ChangeNotifier {
           hacermov(piezaSelecionada, nuevaPosicion);
           turno++;
         }
-        if (red == 0) {}
-        if (black == 0) {}
       }
+    }
+    if (red == 0 || black == 0) {
+      gameover = true;
     }
   }
 
@@ -125,7 +138,22 @@ class AppData extends ChangeNotifier {
           int nuevaFila = int.parse(nuevaPosicion[1]) - 1;
           int nuevaColumna = nuevaPosicion.codeUnitAt(0) - 'a'.codeUnitAt(0);
           // Colocar la pieza en la nueva posición
+
+          // Verificar si la posición final es la fila 1 y la pieza contiene "n"
+          if (nuevaFila == 0 && piezaSelecionada.contains('n')) {
+            print("reina");
+            piezaSelecionada = "Q" + piezaSelecionada;
+          }
+
+          // Verificar si la posición final es la fila 8 y la pieza contiene "r"
+          if (nuevaFila == 7 && piezaSelecionada.contains('r')) {
+            // Realizar una acción específica
+            // Por ejemplo, eliminar la pieza
+            // board[nuevaFila][nuevaColumna] = '-';
+            piezaSelecionada = "Q" + piezaSelecionada;
+          }
           board[nuevaFila][nuevaColumna] = piezaSelecionada;
+
           notifyListeners();
         }
       }
@@ -305,6 +333,33 @@ class AppData extends ChangeNotifier {
       print('Error de conexión: $error');
     }
   }
+
+  Future<void> enviarMove(
+      String serverUrl, String posicion, String password) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://$serverUrl/login'),
+        body: {
+          'username': username,
+          'password': password,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Procesar la respuesta si es exitosa
+        print('Usuario autenticado');
+        validate = true;
+        notifyListeners();
+      } else {
+        // Manejar errores si la solicitud no es exitosa
+        print('Error al autenticar usuario');
+      }
+    } catch (error) {
+      // Manejar errores de conexión
+      print('Error de conexión: $error');
+    }
+  }
 }
+
 
 // Fin de Funciones de inicio de session
