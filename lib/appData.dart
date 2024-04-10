@@ -116,14 +116,17 @@ class AppData extends ChangeNotifier {
           esMovimientoValido(piezaSelecionada, posicionActual, nuevaPosicion,
               numeracion, board)) {
         if (turno % 2 == 0 && piezaSelecionada.contains("r")) {
-          hacermov(piezaSelecionada, nuevaPosicion);
+          hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
+
+          print("racha: $racha");
           if (!racha) {
             turno++;
             turnoActual = "Black";
           }
         }
         if (turno % 2 != 0 && piezaSelecionada.contains("n")) {
-          hacermov(piezaSelecionada, nuevaPosicion);
+          hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
+          print("racha: $racha");
           if (!racha) {
             turno++;
             turnoActual = "Red";
@@ -131,13 +134,15 @@ class AppData extends ChangeNotifier {
         }
       }
     }
-
+    esPosibleSeguir(
+        piezaSelecionada, posicionActual, nuevaPosicion, numeracion, board);
     if (red == 0 || black == 0) {
       gameover = true;
     }
   }
 
-  void hacermov(String piezaSelecionada, String nuevaPosicion) {
+  void hacermov(
+      String piezaSelecionada, String nuevaPosicion, String posicionActual) {
     for (var fila = 0; fila < board.length; fila++) {
       for (var columna = 0; columna < board[fila].length; columna++) {
         if (board[fila][columna] == piezaSelecionada) {
@@ -164,6 +169,7 @@ class AppData extends ChangeNotifier {
             }
           }
           board[nuevaFila][nuevaColumna] = piezaSelecionada;
+
           if (queen) {
             racha = false;
             queen = false;
@@ -190,7 +196,7 @@ class AppData extends ChangeNotifier {
     return false;
   }
 
-  bool esPosibleSeguir(
+  void esPosibleSeguir(
       String ficha,
       String posicionInicial,
       String posicionFinal,
@@ -203,15 +209,108 @@ class AppData extends ChangeNotifier {
     int filaFinal =
         numeracion.indexWhere((fila) => fila.contains(posicionFinal));
     int columnaFinal = numeracion[filaFinal].indexOf(posicionFinal);
-    esMovimentoBack(
-        ficha, filaInicial, columnaInicial, filaFinal, columnaFinal);
-    // Calcular la diferencia entre las filas y columnas
-    int difFilas = (filaFinal - filaInicial).abs();
-    int difColumnas = (columnaFinal - columnaInicial).abs();
-    print("lado 1: " + tablero[difFilas + 1][difColumnas + 1]);
-    print("lado 1: " + tablero[difFilas + 1][difColumnas + 1]);
 
-    return false;
+    // Determinar la dirección permitida según el tipo de ficha
+    bool permitidoHaciaAdelante = ficha.contains("Q") || ficha.contains("n");
+    bool permitidoHaciaAtras = ficha.contains("Q") || ficha.contains("r");
+
+    // Diagonal hacia adelante izquierda desde la posición final
+    if (permitidoHaciaAdelante) {
+      int filaDiagonalAdelanteIzquierda =
+          filaFinal - (filaFinal - filaInicial).abs();
+      int columnaDiagonalAdelanteIzquierda =
+          columnaFinal - (columnaFinal - columnaInicial).abs();
+      if (filaDiagonalAdelanteIzquierda >= 0 &&
+          filaDiagonalAdelanteIzquierda < numeracion.length &&
+          columnaDiagonalAdelanteIzquierda >= 0 &&
+          columnaDiagonalAdelanteIzquierda <
+              numeracion[filaDiagonalAdelanteIzquierda].length &&
+          tablero[filaDiagonalAdelanteIzquierda]
+                  [columnaDiagonalAdelanteIzquierda] ==
+              "-") {
+        print(
+            'Diagonal hacia adelante izquierda desde la posición final: ${numeracion[filaDiagonalAdelanteIzquierda][columnaDiagonalAdelanteIzquierda]}');
+      } else {
+        print(
+            'Diagonal hacia adelante izquierda desde la posición final: No se puede seguir en esta dirección');
+      }
+    } else {
+      print(
+          'Diagonal hacia adelante izquierda desde la posición final: Movimiento no permitido');
+    }
+
+    // Diagonal hacia adelante derecha desde la posición final
+    if (permitidoHaciaAdelante) {
+      int filaDiagonalAdelanteDerecha =
+          filaFinal - (filaFinal - filaInicial).abs();
+      int columnaDiagonalAdelanteDerecha =
+          columnaFinal + (columnaFinal - columnaInicial).abs();
+      if (filaDiagonalAdelanteDerecha >= 0 &&
+          filaDiagonalAdelanteDerecha < numeracion.length &&
+          columnaDiagonalAdelanteDerecha >= 0 &&
+          columnaDiagonalAdelanteDerecha <
+              numeracion[filaDiagonalAdelanteDerecha].length &&
+          tablero[filaDiagonalAdelanteDerecha]
+                  [columnaDiagonalAdelanteDerecha] ==
+              "-") {
+        print(
+            'Diagonal hacia adelante derecha desde la posición final: ${numeracion[filaDiagonalAdelanteDerecha][columnaDiagonalAdelanteDerecha]}');
+      } else {
+        print(
+            'Diagonal hacia adelante derecha desde la posición final: No se puede seguir en esta dirección');
+      }
+    } else {
+      print(
+          'Diagonal hacia adelante derecha desde la posición final: Movimiento no permitido');
+    }
+
+    // Diagonal hacia atrás izquierda desde la posición final
+    if (permitidoHaciaAtras) {
+      int filaDiagonalAtrasIzquierda =
+          filaFinal + (filaFinal - filaInicial).abs();
+      int columnaDiagonalAtrasIzquierda =
+          columnaFinal - (columnaFinal - columnaInicial).abs();
+      if (filaDiagonalAtrasIzquierda >= 0 &&
+          filaDiagonalAtrasIzquierda < numeracion.length &&
+          columnaDiagonalAtrasIzquierda >= 0 &&
+          columnaDiagonalAtrasIzquierda <
+              numeracion[filaDiagonalAtrasIzquierda].length &&
+          tablero[filaDiagonalAtrasIzquierda][columnaDiagonalAtrasIzquierda] ==
+              "-") {
+        print(
+            'Diagonal hacia atrás izquierda desde la posición final: ${numeracion[filaDiagonalAtrasIzquierda][columnaDiagonalAtrasIzquierda]}');
+      } else {
+        print(
+            'Diagonal hacia atrás izquierda desde la posición final: No se puede seguir en esta dirección');
+      }
+    } else {
+      print(
+          'Diagonal hacia atrás izquierda desde la posición final: Movimiento no permitido');
+    }
+
+    // Diagonal hacia atrás derecha desde la posición final
+    if (permitidoHaciaAtras) {
+      int filaDiagonalAtrasDerecha =
+          filaFinal + (filaFinal - filaInicial).abs();
+      int columnaDiagonalAtrasDerecha =
+          columnaFinal + (columnaFinal - columnaInicial).abs();
+      if (filaDiagonalAtrasDerecha >= 0 &&
+          filaDiagonalAtrasDerecha < numeracion.length &&
+          columnaDiagonalAtrasDerecha >= 0 &&
+          columnaDiagonalAtrasDerecha <
+              numeracion[filaDiagonalAtrasDerecha].length &&
+          tablero[filaDiagonalAtrasDerecha][columnaDiagonalAtrasDerecha] ==
+              "-") {
+        print(
+            'Diagonal hacia atrás derecha desde la posición final: ${numeracion[filaDiagonalAtrasDerecha][columnaDiagonalAtrasDerecha]}');
+      } else {
+        print(
+            'Diagonal hacia atrás derecha desde la posición final: No se puede seguir en esta dirección');
+      }
+    } else {
+      print(
+          'Diagonal hacia atrás derecha desde la posición final: Movimiento no permitido');
+    }
   }
 
   bool esMovimientoValido(
@@ -232,12 +331,13 @@ class AppData extends ChangeNotifier {
     // Calcular la diferencia entre las filas y columnas
     int difFilas = (filaFinal - filaInicial).abs();
     int difColumnas = (columnaFinal - columnaInicial).abs();
+    if ((ficha.contains("r") && turno % 2 != 0) ||
+        (ficha.contains("n") && turno % 2 == 0)) {
+      return false;
+    }
     if (ficha.contains("Q")) {
       if (difFilas == difColumnas) {
         if (difFilas == 1) {
-          if (racha) {
-            return false;
-          }
           return true; // Movimiento válido en diagonal
         } else {
           // Verificar casillas intermedias en movimientos diagonales
@@ -257,11 +357,7 @@ class AppData extends ChangeNotifier {
               // Actualizar el tablero: la casilla intermedia se convierte en "-"
               tablero[filaIntermedia][columnaIntermedia] = "-";
 
-              racha = true;
-
               return true; // Movimiento válido con casilla intermedia ocupada
-            } else {
-              racha = false;
             }
           }
           return true; // Movimiento válido en diagonal
@@ -275,9 +371,6 @@ class AppData extends ChangeNotifier {
         // Verificar si el movimiento es válido según las reglas del juego
         print('diferencia de filas $difFilas');
         if (difFilas == 1) {
-          if (racha) {
-            return false;
-          }
           return true; // Movimiento válido en diagonal
         }
         if (difFilas == 2) {
@@ -290,21 +383,16 @@ class AppData extends ChangeNotifier {
           if (tablero[filaIntermedia][columnaIntermedia] != "-") {
             if (tablero[filaIntermedia][columnaIntermedia].startsWith("r")) {
               red--;
-              racha = true;
             }
             if (tablero[filaIntermedia][columnaIntermedia].startsWith("n")) {
               black--;
-              racha = true;
             }
 
             // Actualizar el tablero: la casilla intermedia se convierte en "-"
             tablero[filaIntermedia][columnaIntermedia] = "-";
-            esPosibleSeguir(
-                ficha, posicionInicial, posicionFinal, numeracion, tablero);
+
             return true; // Movimiento válido en diagonal con casilla intermedia ocupada
           }
-        } else {
-          racha = false;
         }
       }
     }
@@ -357,12 +445,12 @@ class AppData extends ChangeNotifier {
   }
 
   Future<void> loginUser(
-      String serverUrl, String username, String password) async {
+      String serverUrl, String email, String password) async {
     try {
       final response = await http.post(
         Uri.parse('http://$serverUrl/login'),
         body: {
-          'username': username,
+          'email': email,
           'password': password,
         },
       );

@@ -133,7 +133,7 @@ class _GameFormState extends State<GameForm> {
         onTap: () {
           contTap++;
           _handleSquareClick(position, piece, contTap, appData);
-          print(contTap);
+          print("Tap: $contTap");
         },
         child: Container(
           decoration: BoxDecoration(
@@ -179,13 +179,10 @@ class _GameFormState extends State<GameForm> {
       setState(() {
         tap2.add(position);
         tap2.add(piece);
-
+        appData.colocarfichas(tap1[1], tap1[0], tap2[0], tap2[1]);
         print(
             "-------\n tap1 : ${tap1[0]}, ${tap1[1]}\n tap2 ${tap2[0]}, ${tap2[1]}\n-------");
-        appData.colocarfichas(tap1[1], tap1[0], tap2[0], tap2[1]);
 
-        print(appData.black);
-        // Verificar si se ha acabado el juego
         if (appData.gameover) {
           String winner = appData.red == 0 ? "black" : "red";
           _showGameOverDialog(context, winner, appData);

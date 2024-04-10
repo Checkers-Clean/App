@@ -25,7 +25,7 @@ class _LoginFormState extends State<LoginForm> {
           TextField(
             controller: _usernameController,
             decoration: const InputDecoration(
-              labelText: 'Usuario',
+              labelText: 'Email',
             ),
             style: const TextStyle(
               fontFamily: 'Roboto', // Establece la fuente como Roboto
