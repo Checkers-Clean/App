@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 
 class AppData extends ChangeNotifier {
   // Variables de inicio de sesion
+  final String ip = "https://chekers.ieti.site";
   String? username;
   String? password;
 
@@ -408,14 +409,14 @@ class AppData extends ChangeNotifier {
     this.new_username = new_username;
     this.new_password = new_password;
     this.new_email = new_email;
-    CreateUserSend("localhost:3000", new_username, new_password, new_email);
+    CreateUserSend(ip, new_username, new_password, new_email);
   }
 
   Future<void> CreateUserSend(
       String serverUrl, String username, String password, String email) async {
     try {
       final response = await http.post(
-        Uri.parse('http://$serverUrl/createUser'),
+        Uri.parse('$serverUrl/createUser'),
         body: {
           'username': username,
           'password': password,
@@ -441,14 +442,14 @@ class AppData extends ChangeNotifier {
   void saveUser(String username, String password) {
     this.username = username;
     this.password = password;
-    loginUser("localhost:3000", username, password);
+    loginUser(ip, username, password);
   }
 
   Future<void> loginUser(
       String serverUrl, String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('http://$serverUrl/login'),
+        Uri.parse('$serverUrl/login'),
         body: {
           'email': email,
           'password': password,
