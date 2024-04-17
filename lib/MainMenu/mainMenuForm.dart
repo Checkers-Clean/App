@@ -2,7 +2,7 @@ import 'package:checker/Game/gamePage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../GameOnline/gameOnlinePage.dart';
+import '../GameOnline/Game/gameOnlinePage.dart';
 import '../appData.dart';
 
 class MainMenuForm extends StatefulWidget {

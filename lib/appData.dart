@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 class AppData extends ChangeNotifier {
   // Variables de inicio de sesion
   final String ip = "https://chekers.ieti.site";
+  //final String ip = "http://localhost:3000";
   String? username;
   String? password;
 
@@ -22,6 +23,10 @@ class AppData extends ChangeNotifier {
   // fin de variable de inicio de session
 
   // Variables de juego
+  bool online = false;
+  String player1 = "";
+  String player2 = "";
+
   String turnoActual = "Red";
   int red = 12;
   int black = 12;
@@ -403,24 +408,17 @@ class AppData extends ChangeNotifier {
 
   // Fin de variables de juego
 
-  // Funciones de inicio de session
-
-  void CreateUser(String new_username, String new_password, String new_email) {
-    this.new_username = new_username;
-    this.new_password = new_password;
-    this.new_email = new_email;
-    CreateUserSend(ip, new_username, new_password, new_email);
-  }
-
-  Future<void> CreateUserSend(
-      String serverUrl, String username, String password, String email) async {
+  // Funciones de juego online
+  Future<void> sendmove(String serverUrl, String username, String ficha,
+      String posicionInicial, String posicionFinal) async {
     try {
       final response = await http.post(
         Uri.parse('$serverUrl/createUser'),
         body: {
           'username': username,
-          'password': password,
-          'email': email,
+          'ficha': ficha,
+          'posInit': posicionInicial,
+          'posFin': posicionFinal,
         },
       );
 
@@ -439,6 +437,44 @@ class AppData extends ChangeNotifier {
     }
   }
 
+  // fin de juego online
+
+  // Funciones de inicio de session
+
+  void CreateUser(String new_username, String new_password, String new_email) {
+    this.new_username = new_username;
+    this.new_password = new_password;
+    this.new_email = new_email;
+    CreateUserSend(ip, new_username, new_password, new_email);
+  }
+
+  Future<void> CreateUserSend(
+      String serverUrl, String username, String password, String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$serverUrl/api/users'),
+        body: {
+          'name': username,
+          'password': password,
+          'email': email,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Procesar la respuesta si es exitosa
+        print('Usuario Creado');
+
+        notifyListeners();
+      } else {
+        // Manejar errores si la solicitud no es exitosa
+        print(response.statusCode);
+      }
+    } catch (error) {
+      // Manejar errores de conexión
+      print('Error de conexión: $error');
+    }
+  }
+
   void saveUser(String username, String password) {
     this.username = username;
     this.password = password;
@@ -449,7 +485,7 @@ class AppData extends ChangeNotifier {
       String serverUrl, String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('$serverUrl/login'),
+        Uri.parse('$serverUrl/api/authenticate'),
         body: {
           'email': email,
           'password': password,
@@ -463,7 +499,7 @@ class AppData extends ChangeNotifier {
         notifyListeners();
       } else {
         // Manejar errores si la solicitud no es exitosa
-        print('Error al autenticar usuario');
+        print(response.statusCode);
       }
     } catch (error) {
       // Manejar errores de conexión
@@ -474,51 +510,4 @@ class AppData extends ChangeNotifier {
 // Fin de Funciones de inicio de session
 
 // Funciones de jugabilidad en linea
-  Future<void> enviarMove(
-      String serverUrl, String posicion, String password) async {
-    try {
-      final response = await http.post(
-        Uri.parse('http://$serverUrl/login'),
-        body: {
-          'username': username,
-          'password': password,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        // Procesar la respuesta si es exitosa
-        print('Usuario autenticado');
-        validate = true;
-        notifyListeners();
-      } else {
-        // Manejar errores si la solicitud no es exitosa
-        print('Error al autenticar usuario');
-      }
-    } catch (error) {
-      // Manejar errores de conexión
-      print('Error de conexión: $error');
-    }
-  }
-
-  Future<void> recivirTurno(
-      String serverUrl, String posicion, String password) async {
-    try {
-      final response = await http.get(
-        Uri.parse('http://$serverUrl/api/game/iniciarPartida'),
-      );
-      if (response.statusCode == 200) {
-        Map<String, dynamic> jsonResponse = json.decode(response.body);
-
-        String turno = jsonResponse['turn'];
-        turnoActual = turno;
-
-        print('Turno recibido: $turno');
-      } else {
-        print('Error al recibir turno del servidor');
-      }
-    } catch (error) {
-      // Manejar errores de conexión
-      print('Error de conexión: $error');
-    }
-  }
 }
