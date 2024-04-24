@@ -1,4 +1,5 @@
 import 'package:checker/Game/gamePage.dart';
+import 'package:checker/GameOnline/Loby/lobyPage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -123,7 +124,7 @@ class _MainMenuFormState extends State<MainMenuForm> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => GameOnlinePage()),
+                  MaterialPageRoute(builder: (context) => lobyPage()),
                 );
               },
               style: ElevatedButton.styleFrom(

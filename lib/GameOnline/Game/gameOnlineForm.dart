@@ -31,7 +31,20 @@ class _GameOnlineFormState extends State<GameOnlineForm> {
         Expanded(
           child: Container(
             color: Colors.black, // Color del lateral izquierdo
-            // Aquí puedes colocar cualquier widget para el lateral izquierdo
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Mostrar la ID de la partida almacenada en appData
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'ID de la Partida: ${appData.ipPartida}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         Expanded(
@@ -191,6 +204,7 @@ class _GameOnlineFormState extends State<GameOnlineForm> {
         contTap = 0;
         tap1.clear();
         tap2.clear();
+
         // Restablecer el estado de marcado de los cuadrados
         isMarked = List.generate(8, (_) => List.filled(8, false));
       });

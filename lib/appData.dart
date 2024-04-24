@@ -7,13 +7,29 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+
+import 'SocketManager.dart';
 
 class AppData extends ChangeNotifier {
   // Variables de inicio de sesion
-  final String ip = "https://chekers.ieti.site";
-  //final String ip = "http://localhost:3000";
+  //final String ip = "https://chekers.ieti.site";
+
+  final String ip = "localhost:443";
+  late SocketManager socketManager;
+
+  AppData() {
+    // Inicializa la instancia de SocketManager con la URL del servidor
+    socketManager = SocketManager(serverUrl: 'https://$ip');
+    // Conecta al servidor cuando se crea una instancia de AppData
+    socketManager.connect();
+  }
   String? username;
   String? password;
+
+  late String token;
+  late String ipPartida;
 
   String? new_username;
   String? new_password;
@@ -127,7 +143,11 @@ class AppData extends ChangeNotifier {
           print("racha: $racha");
           if (!racha) {
             turno++;
-            turnoActual = "Black";
+            if (player2 == "") {
+              turnoActual = "Black";
+            } else {
+              turnoActual == player2;
+            }
           }
         }
         if (turno % 2 != 0 && piezaSelecionada.contains("n")) {
@@ -135,7 +155,11 @@ class AppData extends ChangeNotifier {
           print("racha: $racha");
           if (!racha) {
             turno++;
-            turnoActual = "Red";
+            if (player1 == "") {
+              turnoActual = "Red";
+            } else {
+              turnoActual = player1;
+            }
           }
         }
       }
@@ -405,40 +429,7 @@ class AppData extends ChangeNotifier {
 
     return false; // Movimiento inválido
   }
-
   // Fin de variables de juego
-
-  // Funciones de juego online
-  Future<void> sendmove(String serverUrl, String username, String ficha,
-      String posicionInicial, String posicionFinal) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$serverUrl/createUser'),
-        body: {
-          'username': username,
-          'ficha': ficha,
-          'posInit': posicionInicial,
-          'posFin': posicionFinal,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        // Procesar la respuesta si es exitosa
-        print('Usuario Creado');
-
-        notifyListeners();
-      } else {
-        // Manejar errores si la solicitud no es exitosa
-        print('Error al autenticar usuario');
-      }
-    } catch (error) {
-      // Manejar errores de conexión
-      print('Error de conexión: $error');
-    }
-  }
-
-  // fin de juego online
-
   // Funciones de inicio de session
 
   void CreateUser(String new_username, String new_password, String new_email) {
@@ -451,19 +442,31 @@ class AppData extends ChangeNotifier {
   Future<void> CreateUserSend(
       String serverUrl, String username, String password, String email) async {
     try {
-      final response = await http.post(
-        Uri.parse('$serverUrl/api/users'),
-        body: {
+      // Configura el cliente HTTP para que acepte todos los certificados
+      HttpClient client = HttpClient()
+        ..badCertificateCallback =
+            ((X509Certificate cert, String host, int port) => true);
+
+      final response = await client
+          .postUrl(Uri.parse('https://$serverUrl/api/users'))
+          .then((HttpClientRequest request) {
+        // Establece el encabezado Content-Type a application/json
+        request.headers.set('Content-Type', 'application/json');
+        // Convierte los datos a JSON
+        String jsonData = json.encode({
           'name': username,
           'password': password,
           'email': email,
-        },
-      );
+        });
+        // Agrega los datos al cuerpo de la solicitud
+        request.write(jsonData);
+        // Envía la solicitud y espera la respuesta
+        return request.close();
+      });
 
       if (response.statusCode == 200) {
         // Procesar la respuesta si es exitosa
         print('Usuario Creado');
-
         notifyListeners();
       } else {
         // Manejar errores si la solicitud no es exitosa
@@ -484,22 +487,46 @@ class AppData extends ChangeNotifier {
   Future<void> loginUser(
       String serverUrl, String email, String password) async {
     try {
-      final response = await http.post(
-        Uri.parse('$serverUrl/api/authenticate'),
-        body: {
+      // Configura el cliente HTTP para que acepte todos los certificados
+      HttpClient client = HttpClient()
+        ..badCertificateCallback =
+            ((X509Certificate cert, String host, int port) => true);
+
+      final response = await client
+          .postUrl(Uri.parse('https://$serverUrl/api/authenticate'))
+          .then((HttpClientRequest request) {
+        // Establece el encabezado Content-Type a application/json
+        request.headers.set('Content-Type', 'application/json');
+        // Convierte los datos a JSON
+        String jsonData = json.encode({
           'email': email,
           'password': password,
-        },
-      );
+        });
+        // Agrega los datos al cuerpo de la solicitud
+        request.write(jsonData);
+        // Envía la solicitud y espera la respuesta
+        return request.close();
+      });
+
+      // Lee el cuerpo de la respuesta como una cadena de texto
+      String responseBody = await response.transform(utf8.decoder).join();
 
       if (response.statusCode == 200) {
+        // Parsea la respuesta JSON
+        Map<String, dynamic> jsonResponse = json.decode(responseBody);
+        // Extrae el token del JSON
+        token = jsonResponse['token'];
+
+        // Imprime el token recibido
+        print('Token recibido: $token');
+
         // Procesar la respuesta si es exitosa
         print('Usuario autenticado');
         validate = true;
         notifyListeners();
       } else {
         // Manejar errores si la solicitud no es exitosa
-        print(response.statusCode);
+        print('Error al autenticar usuario: $responseBody');
       }
     } catch (error) {
       // Manejar errores de conexión
@@ -507,7 +534,19 @@ class AppData extends ChangeNotifier {
     }
   }
 
-// Fin de Funciones de inicio de session
-
+// Fin de inicio de session
 // Funciones de jugabilidad en linea
+
+  void createGame() {
+    player1 = username!;
+    turnoActual = player1;
+    //webSocketConnection.sendMessage("unirse-a-sala", "aaaaaaa");
+  }
+
+  /* void uniteGame(String idPartida) {
+    this.ipPartida = idPartida;
+    player1 = username!;
+    turnoActual = player1;
+    createGamesend(ip, token);
+  } */
 }
