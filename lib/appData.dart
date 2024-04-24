@@ -12,24 +12,33 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'SocketManager.dart';
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 class AppData extends ChangeNotifier {
   // Variables de inicio de sesion
   //final String ip = "https://chekers.ieti.site";
 
   final String ip = "localhost:443";
   late SocketManager socketManager;
-
   AppData() {
+    HttpOverrides.global = MyHttpOverrides();
     // Inicializa la instancia de SocketManager con la URL del servidor
-    socketManager = SocketManager(serverUrl: 'https://$ip');
+    socketManager = SocketManager();
     // Conecta al servidor cuando se crea una instancia de AppData
-    socketManager.connect();
+    socketManager.initializeSocket();
   }
   String? username;
   String? password;
 
   late String token;
-  late String ipPartida;
+  String ipPartida = "";
 
   String? new_username;
   String? new_password;

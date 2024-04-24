@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../appData.dart';
 
 class EsperaForm extends StatefulWidget {
   @override
@@ -6,7 +9,7 @@ class EsperaForm extends StatefulWidget {
 }
 
 class _EsperaFormState extends State<EsperaForm> {
-  String username = "usuario"; // Puedes cambiar el valor aquí
+// Puedes cambiar el valor aquí
 
   IconData iconoX = Icons.close;
   Color colorX = Colors.red;
@@ -25,98 +28,100 @@ class _EsperaFormState extends State<EsperaForm> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "App de Ejemplo",
-            style: TextStyle(
-              color: Colors.white,
+    var appData = Provider.of<AppData>(context);
+
+    print(appData.socketManager.partida);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          appData.ipPartida,
+          style: TextStyle(
+            color: Colors.white, // Cambiar el color del texto a blanco
+          ),
+        ),
+        backgroundColor: Colors.black, // Cambiar el color de fondo a negro
+        centerTitle: true,
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Container(
+                color: Colors.black, // Cambiar el color de fondo a negro
+                child: Row(
+                  children: <Widget>[
+                    Text(
+                      "Username: ",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      appData.player1,
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        iconoX,
+                        color: colorX,
+                      ),
+                      onPressed: cambiarIcono,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                color: Colors.black, // Cambiar el color de fondo a negro
+                child: Row(
+                  children: <Widget>[
+                    Text(
+                      "Username: ",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      appData.player2,
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        iconoX,
+                        color: colorX,
+                      ),
+                      onPressed: cambiarIcono,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20),
+          TextButton(
+            onPressed: () {
+              // Aquí puedes poner la lógica para cambiar el icono a O
+              cambiarIcono();
+            },
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.black),
+            ),
+            child: Text(
+              "Listo",
+              style: TextStyle(
+                color: Colors.white,
+              ),
             ),
           ),
-          backgroundColor: Colors.blue,
-          centerTitle: true,
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Container(
-                  color: Colors.red,
-                  child: Row(
-                    children: <Widget>[
-                      Text(
-                        "Username: ",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        username,
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          iconoX,
-                          color: colorX,
-                        ),
-                        onPressed: cambiarIcono,
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  color: Colors.black,
-                  child: Row(
-                    children: <Widget>[
-                      Text(
-                        "Username: ",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        username,
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          iconoX,
-                          color: colorX,
-                        ),
-                        onPressed: cambiarIcono,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            TextButton(
-              onPressed: () {
-                // Aquí puedes poner la lógica para cambiar el icono a O
-                cambiarIcono();
-              },
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.blue),
-              ),
-              child: Text(
-                "Listo",
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
