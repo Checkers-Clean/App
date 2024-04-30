@@ -177,6 +177,12 @@ class _GameOnlineFormState extends State<GameOnlineForm> {
     int count,
     AppData appData,
   ) {
+    // Verificar si el turno actual coincide con el nombre de usuario
+    if (appData.turnoActual != appData.username) {
+      // Si el turno actual no es del usuario, no hacer nada
+      return;
+    }
+
     if (count == 1) {
       setState(() {
         tap1.add(position);
@@ -204,7 +210,6 @@ class _GameOnlineFormState extends State<GameOnlineForm> {
         contTap = 0;
         tap1.clear();
         tap2.clear();
-
         // Restablecer el estado de marcado de los cuadrados
         isMarked = List.generate(8, (_) => List.filled(8, false));
       });

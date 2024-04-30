@@ -147,8 +147,18 @@ class AppData extends ChangeNotifier {
           esMovimientoValido(piezaSelecionada, posicionActual, nuevaPosicion,
               numeracion, board)) {
         if (turno % 2 == 0 && piezaSelecionada.contains("r")) {
-          hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
-
+          if (online) {
+            if (turnoActual != username) {
+              hacermov(socketManager.piezaSelecionada,
+                  socketManager.nuevaPosicion, socketManager.posicionActual);
+            } else {
+              hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
+              socketManager.move(
+                  posicionActual, nuevaPosicion, posicionActual, token);
+            }
+          } else {
+            hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
+          }
           print("racha: $racha");
           if (!racha) {
             turno++;
@@ -160,7 +170,19 @@ class AppData extends ChangeNotifier {
           }
         }
         if (turno % 2 != 0 && piezaSelecionada.contains("n")) {
-          hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
+          if (online) {
+            if (turnoActual != username) {
+              hacermov(socketManager.piezaSelecionada,
+                  socketManager.nuevaPosicion, socketManager.posicionActual);
+            } else {
+              hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
+              socketManager.move(
+                  posicionActual, nuevaPosicion, posicionActual, token);
+            }
+          } else {
+            hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
+          }
+
           print("racha: $racha");
           if (!racha) {
             turno++;

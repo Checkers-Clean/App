@@ -13,8 +13,22 @@ class _EsperaFormState extends State<EsperaForm> {
 
   IconData iconoX = Icons.close;
   Color colorX = Colors.red;
+  IconData iconoY = Icons.close;
+  Color colorY = Colors.red;
 
-  void cambiarIcono() {
+  void cambiarIconoX() {
+    setState(() {
+      if (iconoX == Icons.close) {
+        iconoX = Icons.check;
+        colorX = Colors.green;
+      } else {
+        iconoX = Icons.close;
+        colorX = Colors.red;
+      }
+    });
+  }
+
+  void cambiarIconoY() {
     setState(() {
       if (iconoX == Icons.close) {
         iconoX = Icons.check;
@@ -71,7 +85,7 @@ class _EsperaFormState extends State<EsperaForm> {
                         iconoX,
                         color: colorX,
                       ),
-                      onPressed: cambiarIcono,
+                      onPressed: cambiarIconoX,
                     ),
                   ],
                 ),
@@ -95,10 +109,10 @@ class _EsperaFormState extends State<EsperaForm> {
                     ),
                     IconButton(
                       icon: Icon(
-                        iconoX,
-                        color: colorX,
+                        iconoY,
+                        color: colorY,
                       ),
-                      onPressed: cambiarIcono,
+                      onPressed: cambiarIconoY,
                     ),
                   ],
                 ),
@@ -109,7 +123,7 @@ class _EsperaFormState extends State<EsperaForm> {
           TextButton(
             onPressed: () {
               // Aquí puedes poner la lógica para cambiar el icono a O
-              cambiarIcono();
+              cambiarIconoX();
             },
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(Colors.black),

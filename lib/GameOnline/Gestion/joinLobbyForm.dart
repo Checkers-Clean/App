@@ -38,8 +38,7 @@ class _JoinLobbyFormState extends State<JoinLobbyForm> {
               onPressed: () {
                 // Implementar la lógica para unirse a la partida
                 final lobbyCode = _textController.text;
-                appData.socketManager
-                    .joinRoom(appData.ipPartida, appData.token);
+                appData.socketManager.joinRoom(lobbyCode, appData.token);
                 // Puedes llamar a la función para unirse a la partida con el código
                 // y luego navegar a la página principal o realizar cualquier otra acción
               },

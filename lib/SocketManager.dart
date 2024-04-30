@@ -10,6 +10,7 @@ class SocketManager {
   // Cliente Socket.IO
   late IO.Socket socket;
   String partida = "";
+  late String nuevaPosicion, piezaSelecionada, posicionActual;
 
   // Método para inicializar la conexión con el servidor
   void initializeSocket() {
@@ -27,6 +28,12 @@ class SocketManager {
 
     // Manejar el evento 'unirse-a-sala'
     // Manejar el evento 'sala-creada'
+    socket.on('jugador-unido-sala', (mensaje) {
+      print('Mensaje recibido del servidor: $mensaje');
+      // Transformar el string en JSON
+
+      // Guardar el valor del tag 'gameId' en partida
+    });
     socket.on('sala-creada', (mensaje) {
       print('Mensaje recibido del servidor: $mensaje');
       // Transformar el string en JSON
@@ -36,13 +43,27 @@ class SocketManager {
       print(partida);
     });
 
-    socket.on('sala-creada', (mensaje) {
+    socket.on('inicio-de-partida', (mensaje) {
       print('Mensaje recibido del servidor: $mensaje');
       // Transformar el string en JSON
 
       // Guardar el valor del tag 'gameId' en partida
-      partida = mensaje['gameId'];
-      print(partida);
+    });
+    socket.on('move', (mensaje) {
+      print('Mensaje recibido del servidor: $mensaje');
+      // Transformar el string en JSON
+
+      // Guardar el valor del tag 'gameId' en partida
+      piezaSelecionada = mensaje['piezaSelecionada'];
+      nuevaPosicion = mensaje['nuevaPosicion'];
+      posicionActual = mensaje['posicionActual'];
+    });
+
+    socket.on('unirse-a-sala', (mensaje) {
+      print('Mensaje recibido del servidor: $mensaje');
+      // Transformar el string en JSON
+
+      // Guardar el valor del tag 'gameId' en partida
     });
 
     // Manejar el evento 'prueba' y enviar una respuesta
@@ -70,6 +91,22 @@ class SocketManager {
 
     // Enviar el JSON al servidor para unirse a una sala
     socket.emit('unirse-a-sala', jsonData);
+  }
+
+  void move(String posint, String postfin, String ficha, String token) {
+    // Crear un mapa con roomName y token
+    Map<String, dynamic> data = {
+      'posint': posint,
+      'postfin': postfin,
+      'ficha': ficha,
+      'token': token,
+    };
+
+    // Convertir el mapa a una cadena JSON
+    String jsonData = json.encode(data);
+
+    // Enviar el JSON al servidor para unirse a una sala
+    socket.emit('move', jsonData);
   }
 
   // Método para salir de una sala en el servidor
