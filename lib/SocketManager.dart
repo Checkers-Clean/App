@@ -1,5 +1,6 @@
 // SocketManager.dart
 
+import 'package:checker/appData.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:io';
 import 'dart:convert'; // Importar para poder decodificar JSON
@@ -10,6 +11,7 @@ class SocketManager {
   // Cliente Socket.IO
   late IO.Socket socket;
   String partida = "";
+  String token = "";
   late String nuevaPosicion, piezaSelecionada, posicionActual;
 
   // Método para inicializar la conexión con el servidor
@@ -65,6 +67,12 @@ class SocketManager {
 
       // Guardar el valor del tag 'gameId' en partida
     });
+    socket.on('tokenUpdated', (mensaje) {
+      print('Mensaje token del servidor: $mensaje');
+      // Transformar el string en JSON
+      token = mensaje;
+      // Guardar el valor del tag 'gameId' en partida
+    });
 
     // Manejar el evento 'prueba' y enviar una respuesta
     socket.on('prueba', (mensaje) {
@@ -110,15 +118,32 @@ class SocketManager {
   }
 
   // Método para salir de una sala en el servidor
-  void leaveRoom(String roomName) {
+  void leaveRoom(String roomName, String token) {
+    Map<String, dynamic> data = {
+      'id_game': roomName,
+      'token': token,
+    };
+
+    String jsonData = json.encode(data);
     // Enviar un evento al servidor para salir de una sala
-    socket.emit('salir-de-sala', roomName);
+    socket.emit('salir-de-sala', jsonData);
+  }
+
+  void createRome(String roomName, String token) {
+    Map<String, dynamic> data = {
+      'id_game': roomName,
+      'token': token,
+    };
+
+    String jsonData = json.encode(data);
+    // Enviar un evento al servidor para salir de una sala
+    socket.emit('crear-sala', jsonData);
   }
 
   // Método para salir de una sala en el servidor
-  void createRome(String roomName) {
+  void getNewToken(String token) {
     // Enviar un evento al servidor para salir de una sala
-    socket.emit('crear-sala', roomName);
+    socket.emit('token', token);
   }
 
   // Método para enviar un mensaje de prueba al servidor y manejar la respuesta

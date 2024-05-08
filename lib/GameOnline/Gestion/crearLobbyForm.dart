@@ -37,8 +37,8 @@ class _crearLobbyFormState extends State<crearLobbyForm> {
               onPressed: () async {
                 // Implementar la lógica para crear la partida
                 final lobbyName = _textController.text;
-                appData.socketManager.sendTestMessage("message");
-                appData.socketManager.createRome(appData.token);
+                appData.socketManager
+                    .createRome(lobbyName, appData.socketManager.token);
 
                 // Esperar un par de segundos antes de navegar
                 await Future.delayed(Duration(seconds: 2));

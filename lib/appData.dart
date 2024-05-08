@@ -37,7 +37,7 @@ class AppData extends ChangeNotifier {
   String? username;
   String? password;
 
-  late String token;
+  late String token = "";
   String ipPartida = "";
 
   String? new_username;
@@ -547,9 +547,10 @@ class AppData extends ChangeNotifier {
         Map<String, dynamic> jsonResponse = json.decode(responseBody);
         // Extrae el token del JSON
         token = jsonResponse['token'];
+        print('Token recibido: $token');
+        socketManager.getNewToken(token);
 
         // Imprime el token recibido
-        print('Token recibido: $token');
 
         // Procesar la respuesta si es exitosa
         print('Usuario autenticado');
