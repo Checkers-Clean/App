@@ -37,9 +37,11 @@ class _crearLobbyFormState extends State<crearLobbyForm> {
               onPressed: () async {
                 // Implementar la lógica para crear la partida
                 final lobbyName = _textController.text;
-                appData.socketManager
-                    .createRome(lobbyName, appData.socketManager.token);
-
+                appData.socketManager.createRome(appData.socketManager.token);
+                await Future.delayed(Duration(seconds: 2));
+                print("tokenpre: " + appData.socketManager.token);
+                appData.token = appData.socketManager.token;
+                print("tokenpost: " + appData.token);
                 // Esperar un par de segundos antes de navegar
                 await Future.delayed(Duration(seconds: 2));
                 appData.ipPartida = appData.socketManager.partida;

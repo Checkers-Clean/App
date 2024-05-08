@@ -35,12 +35,26 @@ class _JoinLobbyFormState extends State<JoinLobbyForm> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 // Implementar la lógica para unirse a la partida
                 final lobbyCode = _textController.text;
-                appData.socketManager.joinRoom(lobbyCode, appData.token);
-                // Puedes llamar a la función para unirse a la partida con el código
-                // y luego navegar a la página principal o realizar cualquier otra acción
+                appData.socketManager
+                    .joinRoom(lobbyCode, appData.socketManager.token);
+
+                print("token: " + appData.token);
+                await Future.delayed(Duration(seconds: 2));
+                appData.token = appData.socketManager.token;
+                print("token: " + appData.token);
+                // Esperar un par de segundos antes de navegar
+                await Future.delayed(Duration(seconds: 2));
+                appData.ipPartida = appData.socketManager.partida;
+                appData.player2 = appData.username!;
+                appData.online = true;
+                // Navegar a la página de espera después de esperar el tiempo especificado
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => esperaPage()),
+                );
               },
               style: ElevatedButton.styleFrom(
                 minimumSize:

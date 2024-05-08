@@ -17,8 +17,8 @@ class _LobbyFormState extends State<LobbyForm> {
   @override
   Widget build(BuildContext context) {
     var appData = Provider.of<AppData>(context);
+
     appData.token = appData.socketManager.token;
-    print("token: " + appData.token);
     return Scaffold(
       appBar: AppBar(
         title: Text('Lobby', style: TextStyle(color: Colors.grey)),

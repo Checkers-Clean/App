@@ -1,5 +1,7 @@
 // SocketManager.dart
 
+import 'dart:async';
+
 import 'package:checker/appData.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:io';
@@ -13,6 +15,13 @@ class SocketManager {
   String partida = "";
   String token = "";
   late String nuevaPosicion, piezaSelecionada, posicionActual;
+
+  String player1 = "";
+  String player2 = "";
+  final _playersController = StreamController<Map<String, String>>();
+  bool play = false;
+
+  Stream<Map<String, String>> get playersStream => _playersController.stream;
 
   // Método para inicializar la conexión con el servidor
   void initializeSocket() {
@@ -37,7 +46,7 @@ class SocketManager {
       // Guardar el valor del tag 'gameId' en partida
     });
     socket.on('sala-creada', (mensaje) {
-      print('Mensaje recibido del servidor: $mensaje');
+      print('Mensaje sala creada del servidor: $mensaje');
       // Transformar el string en JSON
 
       // Guardar el valor del tag 'gameId' en partida
@@ -46,9 +55,14 @@ class SocketManager {
     });
 
     socket.on('inicio-de-partida', (mensaje) {
-      print('Mensaje recibido del servidor: $mensaje');
-      // Transformar el string en JSON
+      print('Mensaje inicio del servidor: $mensaje');
 
+      // Transformar el string en JSON
+      player1 = mensaje['player1'];
+      player2 = mensaje['player2'];
+
+      _playersController.add({'player1': player1, 'player2': player2});
+      play = true;
       // Guardar el valor del tag 'gameId' en partida
     });
     socket.on('move', (mensaje) {
@@ -61,14 +75,21 @@ class SocketManager {
       posicionActual = mensaje['posicionActual'];
     });
 
-    socket.on('unirse-a-sala', (mensaje) {
-      print('Mensaje recibido del servidor: $mensaje');
+    socket.on('jugador-unido-sala', (mensaje) {
+      print('Mensaje unirse a sala del servidor: $mensaje');
       // Transformar el string en JSON
-
+      partida = mensaje;
+      print(partida);
       // Guardar el valor del tag 'gameId' en partida
     });
     socket.on('tokenUpdated', (mensaje) {
-      print('Mensaje token del servidor: $mensaje');
+      print('Mensaje token 1 del servidor: $mensaje');
+      // Transformar el string en JSON
+      token = mensaje;
+      // Guardar el valor del tag 'gameId' en partida
+    });
+    socket.on('token-actualizado-id-game', (mensaje) {
+      print('Mensaje token 2 del servidor: $mensaje');
       // Transformar el string en JSON
       token = mensaje;
       // Guardar el valor del tag 'gameId' en partida
@@ -129,15 +150,9 @@ class SocketManager {
     socket.emit('salir-de-sala', jsonData);
   }
 
-  void createRome(String roomName, String token) {
-    Map<String, dynamic> data = {
-      'id_game': roomName,
-      'token': token,
-    };
-
-    String jsonData = json.encode(data);
+  void createRome(String token) {
     // Enviar un evento al servidor para salir de una sala
-    socket.emit('crear-sala', jsonData);
+    socket.emit('crear-sala', token);
   }
 
   // Método para salir de una sala en el servidor

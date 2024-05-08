@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
@@ -34,6 +35,7 @@ class AppData extends ChangeNotifier {
     // Conecta al servidor cuando se crea una instancia de AppData
     socketManager.initializeSocket();
   }
+
   String? username;
   String? password;
 
@@ -45,6 +47,8 @@ class AppData extends ChangeNotifier {
   String? new_email;
 
   bool validate = false;
+  bool play = false;
+  bool pintar = true;
   // fin de variable de inicio de session
 
   // Variables de juego
@@ -569,16 +573,12 @@ class AppData extends ChangeNotifier {
 // Fin de inicio de session
 // Funciones de jugabilidad en linea
 
-  void createGame() {
-    player1 = username!;
+  void assignarPlayers() {
+    player1 = socketManager.player1;
+    player2 = socketManager.player2;
     turnoActual = player1;
-    //webSocketConnection.sendMessage("unirse-a-sala", "aaaaaaa");
+    play = socketManager.play;
+    String output = "Player1 = $player1 \n Player2 = $player2";
+    print(output);
   }
-
-  /* void uniteGame(String idPartida) {
-    this.ipPartida = idPartida;
-    player1 = username!;
-    turnoActual = player1;
-    createGamesend(ip, token);
-  } */
 }
