@@ -152,48 +152,46 @@ class AppData extends ChangeNotifier {
               numeracion, board)) {
         if (turno % 2 == 0 && piezaSelecionada.contains("r")) {
           if (online) {
-            if (turnoActual != username) {
-              hacermov(socketManager.piezaSelecionada,
-                  socketManager.nuevaPosicion, socketManager.posicionActual);
-            } else {
-              hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
+            if (turnoActual == username) {
+              print("caraga move");
+              //hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
+              print("hace move");
               socketManager.move(
-                  posicionActual, nuevaPosicion, posicionActual, token);
+                  posicionActual, nuevaPosicion, piezaSelecionada, token);
+              print("envia move");
             }
           } else {
             hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
-          }
-          print("racha: $racha");
-          if (!racha) {
-            turno++;
-            if (player2 == "") {
-              turnoActual = "Black";
-            } else {
-              turnoActual == player2;
+            if (!racha) {
+              turno++;
+              if (player2 == "") {
+                turnoActual = "Black";
+              } else {
+                turnoActual == player2;
+              }
             }
           }
         }
         if (turno % 2 != 0 && piezaSelecionada.contains("n")) {
           if (online) {
-            if (turnoActual != username) {
-              hacermov(socketManager.piezaSelecionada,
-                  socketManager.nuevaPosicion, socketManager.posicionActual);
-            } else {
-              hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
+            if (turnoActual == username) {
+              print("caraga move");
+              //hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
+              print("hace move");
               socketManager.move(
-                  posicionActual, nuevaPosicion, posicionActual, token);
+                  posicionActual, nuevaPosicion, piezaSelecionada, token);
+              print("envia move");
             }
           } else {
             hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
-          }
-
-          print("racha: $racha");
-          if (!racha) {
-            turno++;
-            if (player1 == "") {
-              turnoActual = "Red";
-            } else {
-              turnoActual = player1;
+            print("racha: $racha");
+            if (!racha) {
+              turno++;
+              if (player1 == "") {
+                turnoActual = "Red";
+              } else {
+                turnoActual = player1;
+              }
             }
           }
         }
@@ -201,9 +199,6 @@ class AppData extends ChangeNotifier {
     }
     esPosibleSeguir(
         piezaSelecionada, posicionActual, nuevaPosicion, numeracion, board);
-    if (red == 0 || black == 0) {
-      gameover = true;
-    }
   }
 
   void hacermov(
@@ -240,6 +235,25 @@ class AppData extends ChangeNotifier {
             queen = false;
           }
 
+          if (online) {
+            if (turno % 2 == 0 && piezaSelecionada.contains("r")) {
+              print("racha: $racha");
+              if (!racha) {
+                turno++;
+                turnoActual = player2;
+              }
+            }
+            if (turno % 2 != 0 && piezaSelecionada.contains("n")) {
+              print("racha: $racha");
+              if (!racha) {
+                turno++;
+                turnoActual = player1;
+              }
+            }
+          }
+          if (red == 0 || black == 0) {
+            gameover = true;
+          }
           notifyListeners();
         }
       }
@@ -578,7 +592,12 @@ class AppData extends ChangeNotifier {
     player2 = socketManager.player2;
     turnoActual = player1;
     play = socketManager.play;
+    online = true;
     String output = "Player1 = $player1 \n Player2 = $player2";
     print(output);
+  }
+
+  void pausar() {
+    pintar = false;
   }
 }

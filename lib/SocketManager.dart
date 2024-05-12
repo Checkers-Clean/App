@@ -14,12 +14,13 @@ class SocketManager {
   late IO.Socket socket;
   String partida = "";
   String token = "";
-  late String nuevaPosicion, piezaSelecionada, posicionActual;
+  String nuevaPosicion = "", piezaSelecionada = "", posicionActual = "";
 
   String player1 = "";
   String player2 = "";
   final _playersController = StreamController<Map<String, String>>();
   bool play = false;
+  bool getMove = false;
 
   Stream<Map<String, String>> get playersStream => _playersController.stream;
 
@@ -65,16 +66,28 @@ class SocketManager {
       play = true;
       // Guardar el valor del tag 'gameId' en partida
     });
+    /** 
     socket.on('move', (mensaje) {
       print('Mensaje recibido del servidor: $mensaje');
-      // Transformar el string en JSON
+      // Convierte el mensaje en un objeto JSON
+      Map<String, dynamic> jsonMensaje = jsonDecode(mensaje);
 
-      // Guardar el valor del tag 'gameId' en partida
-      piezaSelecionada = mensaje['piezaSelecionada'];
-      nuevaPosicion = mensaje['nuevaPosicion'];
-      posicionActual = mensaje['posicionActual'];
+      // Accede a los valores del JSON
+      String piezaSelecionada = jsonMensaje['ficha'];
+      String nuevaPosicion = jsonMensaje['postfin'];
+      String posicionActual = jsonMensaje['posint'];
+
+      String output = "pieza " +
+          piezaSelecionada +
+          "\n pos " +
+          posicionActual +
+          "\n to " +
+          nuevaPosicion;
+      print(output);
+      getMove = true;
+      // Ahora puedes utilizar las variables piezaSelecionada, nuevaPosicion y posicionActual
     });
-
+    */
     socket.on('jugador-unido-sala', (mensaje) {
       print('Mensaje unirse a sala del servidor: $mensaje');
       // Transformar el string en JSON
@@ -99,6 +112,15 @@ class SocketManager {
     socket.on('prueba', (mensaje) {
       print('Mensaje recibido del servidor: $mensaje');
     });
+  }
+
+  bool reciveMove() {
+    if (getMove) {
+      getMove = false;
+      return true;
+    } else {
+      return false;
+    }
   }
 
   // Método para enviar un mensaje al servidor

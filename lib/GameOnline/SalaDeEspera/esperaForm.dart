@@ -17,8 +17,8 @@ class _EsperaFormState extends State<EsperaForm> {
   String player2 = "";
   String texto = "esperando jugadores";
 
-  Future<void> cambiarnombres(
-      AppData appData, String newpj1, String newpj2) async {
+  Future<void> cambiarnombres(AppData appData, String newpj1, String newpj2,
+      BuildContext context) async {
     appData.assignarPlayers();
     await Future.delayed(Duration(seconds: 2));
     setState(() {
@@ -26,17 +26,22 @@ class _EsperaFormState extends State<EsperaForm> {
       player2 = newpj2;
     });
     if (appData.play & appData.pintar) {
+      print("game start");
       appData.pintar = false;
+      appData.online = true;
       setState(() {
         texto = "comienda en breve";
       });
+
       await Future.delayed(Duration(seconds: 3));
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => GameOnlinePage(),
         ),
       );
+
+      return;
     }
   }
 
@@ -49,7 +54,9 @@ class _EsperaFormState extends State<EsperaForm> {
   Widget build(BuildContext context) {
     var appData = Provider.of<AppData>(context, listen: true);
 
-    cambiarnombres(appData, appData.player1, appData.player2);
+    if (appData.pintar) {
+      cambiarnombres(appData, appData.player1, appData.player2, context);
+    }
 
     return Scaffold(
       appBar: AppBar(

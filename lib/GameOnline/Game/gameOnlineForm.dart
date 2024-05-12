@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../MainMenu/maniManuPage.dart';
 import '../../appData.dart';
 
 class GameOnlineForm extends StatefulWidget {
+  final AppData appData;
+
+  GameOnlineForm({required this.appData});
   @override
   _GameOnlineFormState createState() => _GameOnlineFormState();
 }
@@ -21,11 +26,60 @@ class _GameOnlineFormState extends State<GameOnlineForm> {
     // Inicializar el estado de color y de marcado para cada cuadrado
     squareColors = List.generate(8, (_) => List.filled(8, Colors.grey));
     isMarked = List.generate(8, (_) => List.filled(8, false));
+    setupWebSocketListeners();
+  }
+
+  void setupWebSocketListeners() {
+    widget.appData.socketManager.socket.on('move', (mensaje) {
+      print('Mensaje recibido del servidor: $mensaje');
+      // Convierte el mensaje en un objeto JSON
+      Map<String, dynamic> jsonMensaje = jsonDecode(mensaje);
+
+      // Accede a los valores del JSON
+      String piezaSelecionada = jsonMensaje['ficha'];
+      String nuevaPosicion = jsonMensaje['postfin'];
+      String posicionActual = jsonMensaje['posint'];
+
+      String output = "pieza " +
+          piezaSelecionada +
+          "\n pos " +
+          posicionActual +
+          "\n to " +
+          nuevaPosicion;
+      print(output);
+      // Llama directamente a hacerMove en widget.appData
+      widget.appData.esMovimientoValido(piezaSelecionada, posicionActual,
+          nuevaPosicion, widget.appData.numeracion, widget.appData.board);
+      widget.appData.hacermov(piezaSelecionada, nuevaPosicion, posicionActual);
+      print("red: " +
+          widget.appData.red.toString() +
+          "\n black: " +
+          widget.appData.black.toString());
+      if (widget.appData.red == 0 || widget.appData.black == 0) {
+        String winner = "";
+        if (widget.appData.red == 0) {
+          winner = widget.appData.player1;
+        }
+        if (widget.appData.black == 0) {
+          winner = widget.appData.player2;
+        }
+        _showGameOverDialog(context, winner, widget.appData);
+      }
+      print("hecho");
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     var appData = Provider.of<AppData>(context);
+    print("Turno actual: " +
+        appData.turnoActual +
+        "\n user: " +
+        appData.username! +
+        "\n player 1: " +
+        appData.player1 +
+        "\n player 2: " +
+        appData.player2);
     return Row(
       children: [
         Expanded(
@@ -93,11 +147,22 @@ class _GameOnlineFormState extends State<GameOnlineForm> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                // Mostrar el contenido de la variable turnoActual
                 Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Text(
-                    appData.turnoActual, // Aquí muestra la variable turnoActual
+                    "tu eres: " +
+                        appData
+                            .username!, // Aquí muestra la variable turnoActual
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "le toca a " +
+                        appData
+                            .turnoActual, // Aquí muestra la variable turnoActual
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -179,7 +244,7 @@ class _GameOnlineFormState extends State<GameOnlineForm> {
   ) {
     // Verificar si el turno actual coincide con el nombre de usuario
     if (appData.turnoActual != appData.username) {
-      // Si el turno actual no es del usuario, no hacer nada
+      contTap = 0;
       return;
     }
 
@@ -242,8 +307,9 @@ class _GameOnlineFormState extends State<GameOnlineForm> {
                 Navigator.of(context).pop();
                 //reiniciar el juego
                 _resetGame(appData);
+                appData.socketManager.socket.emit("disconnect");
                 // Cerrar el diálogo y volver al menú principal
-                Navigator.pop(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => MainMenuPage()),
                 );
